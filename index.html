@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Garagem em Miniatura | Coleção de Carrinhos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <div class="container header-container">
+      <div class="logo">
+        <span class="logo-icon">🏎️</span>
+        <span class="logo-text">Garagem<span>Miniatura</span></span>
+      </div>
+      <nav class="nav">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#estatisticas">Estatísticas</a>
+        <a href="#sobre">Sobre</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- DESTAQUE PRINCIPAL -->
+  <section class="hero">
+    <div class="container hero-content">
+      <span class="badge">Coleção Particular</span>
+      <h1>Acervo de Veículos em Miniatura</h1>
+      <p>Catálogo interativo reunindo clássicos, muscle cars, modelos nacionais e superesportivos.</p>
+      
+      <div class="stats-bar" id="estatisticas">
+        <div class="stat-card">
+          <span class="stat-num" id="total-modelos">0</span>
+          <span class="stat-label">Modelos Catalogados</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="total-marcas">0</span>
+          <span class="stat-label">Marcas Presentes</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">1929 – 2019</span>
+          <span class="stat-label">Período Histórico</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO -->
+  <section class="catalog-section" id="catalogo">
+    <div class="container">
+      
+      <!-- BUSCA E BOTÕES DE FILTRO -->
+      <div class="filter-controls">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="Buscar por marca, modelo ou ano..." />
+        </div>
+
+        <div class="categories-pills" id="category-filters">
+          <button class="pill active" data-filter="todos">Todos</button>
+          <button class="pill" data-filter="Clássico">Clássicos</button>
+          <button class="pill" data-filter="Nacional">Nacionais</button>
+          <button class="pill" data-filter="Esportivo">Esportivos</button>
+          <button class="pill" data-filter="Muscle Car">Muscle Cars</button>
+          <button class="pill" data-filter="Utilitário">Picapes & Utilitários</button>
+          <button class="pill" data-filter="Viatura / Serviço">Viaturas & Serviços</button>
+        </div>
+      </div>
+
+      <!-- GRID DE MINIATURAS -->
+      <div class="grid" id="cars-grid"></div>
+      
+      <div id="no-results" class="no-results hidden">
+        <p>Nenhuma miniatura encontrada com esses termos de busca.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL DE DETALHES -->
+  <div class="modal-overlay" id="car-modal">
+    <div class="modal-content">
+      <button class="close-btn" id="modal-close">&times;</button>
+      <div class="modal-body" id="modal-details"></div>
+    </div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <footer class="footer" id="sobre">
+    <div class="container">
+      <h3>Sobre a Coleção</h3>
+      <p>Organização e preservação histórica de modelos em miniatura.</p>
+      <small>© Coleção de Carrinhos. Hospedado via GitHub Pages.</small>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
