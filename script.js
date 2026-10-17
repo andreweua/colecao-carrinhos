@@ -115,9 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const marcas = new Set(colecaoCarros.map(c => c.marca));
   totalMarcas.innerText = marcas.size;
 
-  renderizarCards(colecaoCarros);
-  configurarEventos();
-});
+  // Exemplo de como declarar itens com fotos (locais ou links):
+// { marca: "Ferrari", modelo: "275 GTB", ano: "1966", fabricante: "—", categoria: "Clássico", icon: "🏎️", foto: "img/ferrari-275.jpg" }
 
 function renderizarCards(lista) {
   carsGrid.innerHTML = "";
@@ -131,9 +130,15 @@ function renderizarCards(lista) {
   lista.forEach(car => {
     const card = document.createElement("div");
     card.className = "car-card";
+    
+    // Mostra a foto se existir, senão mostra o emoji/ícone
+    const visualContent = car.foto 
+      ? `<img src="${car.foto}" alt="${car.marca} ${car.modelo}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<span>${car.icon}</span>';">`
+      : `<span>${car.icon}</span>`;
+
     card.innerHTML = `
       <div class="card-image">
-        <span>${car.icon}</span>
+        ${visualContent}
         ${car.ano !== "—" ? `<span class="card-tag-year">${car.ano}</span>` : ""}
       </div>
       <div class="card-content">
@@ -145,8 +150,14 @@ function renderizarCards(lista) {
         </div>
       </div>
     `;
+    
     card.addEventListener("click", () => {
+      const modalVisual = car.foto 
+        ? `<img src="${car.foto}" alt="${car.marca} ${car.modelo}" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">` 
+        : "";
+
       modalDetails.innerHTML = `
+        ${modalVisual}
         <h2 style="font-size: 1.5rem; margin-bottom: 15px;">${car.marca} ${car.modelo}</h2>
         <div class="detail-row"><span>Ano de Fabricação:</span> <strong>${car.ano}</strong></div>
         <div class="detail-row"><span>Categoria:</span> <strong>${car.categoria}</strong></div>
@@ -154,6 +165,7 @@ function renderizarCards(lista) {
       `;
       carModal.classList.add("active");
     });
+    
     carsGrid.appendChild(card);
   });
 }
