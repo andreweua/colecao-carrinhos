@@ -1,6 +1,6 @@
 # 🏎️ Garagem em Miniatura | Coleção de Carrinhos
 
-Catálogo digital interativo desenvolvido para organizar, expor e catalogar uma coleção particular de veículos em miniatura[cite: 2]. O projeto reúne clássicos mundiais[cite: 1, 3, 4], esportivos[cite: 1, 3, 4, 5], muscle cars[cite: 1, 3, 4, 5] e ícones do automobilismo nacional[cite: 1, 3, 4, 5].
+Catálogo digital interativo desenvolvido para organizar, expor e catalogar uma coleção particular de veículos em miniatura. O projeto reúne clássicos mundiais, esportivos, muscle cars e ícones do automobilismo nacional.
 
 ---
 
@@ -9,12 +9,12 @@ Catálogo digital interativo desenvolvido para organizar, expor e catalogar uma 
 - **Catálogo Interativo:** Grid responsivo com cartões individuais para cada miniatura.
 - **Busca em Tempo Real:** Pesquisa instantânea por marca, modelo ou ano do veículo.
 - **Filtros por Categoria:**
-  - Clássicos[cite: 1, 3, 4, 5]
-  - Nacionais[cite: 1, 3, 4, 5]
-  - Esportivos e Hipercarros[cite: 1, 3, 4, 5]
-  - Muscle Cars[cite: 1, 3, 4, 5]
-  - Picapes e Utilitários[cite: 1, 3, 4, 5]
-  - Viaturas e Serviços[cite: 1, 3, 4]
+  - Clássicos
+  - Nacionais
+  - Esportivos e Hipercarros
+  - Muscle Cars
+  - Picapes e Utilitários
+  - Viaturas e Serviços
 - **Modal de Detalhes:** Exibição da ficha técnica da miniatura (marca, ano, categoria e fabricante da miniatura).
 - **Contadores Dinâmicos:** Estatísticas automáticas com a quantidade total de miniaturas e marcas cadastradas.
 - **Design Moderno:** Interface escura (*dark theme*) inspirada no visual automotivo.
