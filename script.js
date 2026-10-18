@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 3.1.0
+ * Versão: 3.2.0
  */
 
 (() => {
@@ -86,7 +86,7 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Exibição da foto limpa
+      // Foto limpa
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -137,10 +137,17 @@
         </div>
       `;
 
-      // Modal de detalhes
-      const openModal = () => showModal(car);
-      card.querySelector(".card-image").addEventListener("click", openModal);
-      card.querySelector(".card-clickable").addEventListener("click", openModal);
+      // Zoom temporário antes de abrir o modal
+      const handleCardOpen = () => {
+        card.classList.add("card-pulse");
+        setTimeout(() => {
+          card.classList.remove("card-pulse");
+          showModal(car);
+        }, 300);
+      };
+
+      card.querySelector(".card-image").addEventListener("click", handleCardOpen);
+      card.querySelector(".card-clickable").addEventListener("click", handleCardOpen);
 
       // Evento de Like
       card.querySelector(".btn-like").addEventListener("click", (e) => {
@@ -155,7 +162,7 @@
         box.classList.toggle("hidden");
       });
 
-      // Enviar opinião para WhatsApp com link do site
+      // Enviar opinião para o WhatsApp com link do acervo
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -292,7 +299,7 @@
       }
     });
 
-    // Menu sanduíche responsivo
+    // Controle do menu sanduíche mobile
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
