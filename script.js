@@ -349,31 +349,67 @@
       }
 
       dom.aiStatus.classList.remove("hidden");
-      dom.aiStatus.textContent = "⏳ Analisando com gemini-3.8-flash...";
+      dom.aiStatus.textContent = "⏳ Analisando miniatura com IA...";
       dom.aiResult.classList.add("hidden");
 
-      const prompt = `Analise este carrinho e compare com os 105 veículos do acervo: ` +
-        state.cars.map((c) => `#${c.id} ${c.marca} ${c.modelo}`).join("; ");
+      // Monta a lista do acervo para o prompt de conferência
+      const prompt = `Você é um especialista em carrinhos em miniatura e curador de acervos. 
+Analise a imagem desta miniatura e compare com a lista dos 105 veículos deste acervo:
+${state.cars.map((c) => `#${c.id}${c.marca} ${c.modelo} (${c.ano})`).join("; ")}
+
+Responda de forma direta e objetiva:
+1. Qual é a marca, modelo e categoria mais provável desta miniatura?
+2. Este carrinho já consta na coleção acima? Se sim, qual é o número (#ID) dele? Se não, avise que se trata de uma nova aquisição em potencial.`;
+
+      // Detecta dinamicamente se a imagem é png ou jpeg
+      const mimeType = state.selectedImageMime || "image/jpeg";
 
       try {
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`, {
+        // Usa o modelo estável oficial gemini-1.5-flash ou gemini-2.0-flash
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: "image/jpeg", data: state.selectedImageBase64 } }] }]
+            contents: [
+              {
+                parts: [
+                  { text: prompt },
+                  {
+                    inline_data: {
+                      mime_type: mimeType,
+                      data: state.selectedImageBase64
+                    }
+                  }
+                ]
+              }
+            ]
           })
         });
+
         const data = await res.json();
+
+        // Se a API do Google retornar erro (ex: chave inválida, cota esgotada)
+        if (data.error) {
+          throw new Error(data.error.message || "Erro retornado pela Google AI");
+        }
+
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
         dom.aiStatus.classList.add("hidden");
-        dom.aiResult.classList.remove("hidden");
-        dom.aiResult.textContent = text || "Não foi possível identificar.";
+
+        if (text) {
+          dom.aiResult.classList.remove("hidden");
+          dom.aiResult.textContent = text;
+        } else {
+          dom.aiResult.classList.remove("hidden");
+          dom.aiResult.textContent = "A IA analisou a foto, mas não gerou descrição conclusiva. Tente uma foto com iluminação melhor.";
+        }
       } catch (err) {
-        dom.aiStatus.textContent = `❌ Erro: ${err.message}`;
+        dom.aiStatus.classList.remove("hidden");
+        dom.aiStatus.textContent = `❌ Erro no Scanner: ${err.message}`;
       }
     });
-  }
-
   function setupEventListeners() {
     dom.searchInput?.addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
