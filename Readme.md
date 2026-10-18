@@ -1,48 +1,37 @@
-# 🏎️ Garagem em Miniatura - Acervo Digital
+# 🏎️ Garagem em Miniatura - Controlador da Aplicação
 
-Catálogo interativo na web para exibição, busca e preservação histórica de uma coleção de 105 veículos em miniatura, hospedado via GitHub Pages.
+Catálogo interativo para exibição, filtragem, avaliação e preservação histórica de uma coleção de 105 miniaturas automotivas.
 
-Desenvolvido por **PereiraLabs** (divisão da *Louzada&Pereira - Soluções Digitais*).
+Desenvolvido por **PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)**.
 
 ---
 
-## 🚀 Demonstração Online
+## 🌐 Acesso Online
 
-Acesse o catálogo em:  
+Catálogo em produção:  
 👉 [https://andreweua.github.io/colecao-carrinhos/](https://andreweua.github.io/colecao-carrinhos/)
 
 ---
 
-## 📌 Funcionalidades
+## ✨ Recursos
 
-- **Visualização em Grade Responsiva:** Cards com proporção de imagem travada (`object-fit: cover`) e área visual limpa.
-- **Categorização Rápida:** Filtros por botões para *Clássicos*, *Nacionais*, *Esportivos*, *Muscle Cars*, *Picapes & Utilitários* e *Viaturas*.
-- **Busca em Tempo Real:** Pesquisa simultânea por modelo, marca ou ano de fabricação.
-- **Modal de Detalhes:** Exibição ampliada da foto com ficha técnica da miniatura (ano, categoria, fabricante da réplica).
-- **Sistema de Reações (Like / Dislike):**
-  - Botão 👍 para curtir miniaturas favoritas.
-  - Botão 👎 com caixa de texto rápida para feedback.
-  - Integração direta com a API do WhatsApp para envio do comentário ao curador da coleção.
-- **Automação de Fotos com OCR:** Processamento de imagens e vinculação de identificadores via script Python com EasyOCR e Pillow.
+- **Layout Mobile-First Responsivo:** Sem vazamento horizontal (`overflow-x: hidden`), com menu sanduíche adaptado e proporções travadas.
+- **Área Visual Limpa:** Cards com imagens enquadradas sem sobreposição de textos; ano integrado ao rodapé junto à categoria.
+- **Sistema de Reações (Like & Dislike):**
+  - Votos armazenados localmente via `localStorage`.
+  - Formulário para comentários curtos em caso de descurtida.
+  - Integração com a API do WhatsApp com mensagem pré-formatada e link do acervo.
+- **Busca e Filtros Rápidos:** Pesquisa em tempo real e categorias organizadas (*Clássico*, *Nacional*, *Esportivo*, *Muscle Car*, *Utilitário*, *Viatura / Serviço*).
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
-
-- **Frontend:** HTML5, CSS3 moderno (Flexbox, CSS Grid, Variáveis CSS), JavaScript Vanilla (ES6+).
-- **Tipografia:** Google Fonts (*Plus Jakarta Sans*).
-- **Hospedagem:** GitHub Pages.
-- **Processamento de Imagens:** Python (Pillow, EasyOCR).
-
----
-
-## 📂 Estrutura de Arquivos
+## 📂 Arquitetura do Projeto
 
 ```text
 colecao-carrinhos/
-├── index.html          # Estrutura da página e marcação semântica
-├── style.css           # Estilos, tema escuro e responsividade
-├── script.js           # Lógica do catálogo, filtros, modal e reações
-├── data.js             # Base de dados estruturada das 105 miniaturas
-├── img/                # Fotos otimizadas das miniaturas (1.jpg, 2.jpg...)
-└── README.md           # Documentação do projeto
+├── index.html       # Estrutura e semântica
+├── style.css        # Folha de estilo e responsividade
+├── script.js        # Lógica da aplicação, menu e interações
+├── data.js          # Base estruturada dos 105 veículos
+├── img/             # Imagens das réplicas automotivas
+└── README.md        # Documentação técnica e institucional

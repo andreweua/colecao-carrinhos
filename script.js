@@ -2,13 +2,13 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 2.2.1
+ * Versão: 3.1.0
  */
 
 (() => {
   "use strict";
 
-  // Número de WhatsApp para receber feedbacks de Dislike
+  // WhatsApp para envio de feedbacks
   const WHATSAPP_NUMERO = "5535992344229";
 
   // Estado da aplicação
@@ -18,7 +18,7 @@
     searchQuery: ""
   };
 
-  // Cache de elementos do DOM
+  // Elementos do DOM
   const dom = {
     carsGrid: document.getElementById("cars-grid"),
     searchInput: document.getElementById("search-input"),
@@ -31,7 +31,6 @@
     modalClose: document.getElementById("modal-close")
   };
 
-  // Gerenciamento de reações locais
   const getReactions = () => {
     try {
       return JSON.parse(localStorage.getItem("garagem_reactions")) || {};
@@ -87,6 +86,7 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
+      // Exibição da foto limpa
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -113,7 +113,7 @@
             <span class="card-id">#${car.id}</span>
           </div>
 
-          <!-- BOTÕES DE REAÇÃO -->
+          <!-- REAÇÕES -->
           <div class="card-actions">
             <div class="feedback-btns">
               <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
@@ -125,7 +125,7 @@
             </div>
           </div>
 
-          <!-- FORMULÁRIO DE FEEDBACK COM LINK DO SITE -->
+          <!-- FORMULÁRIO DE FEEDBACK -->
           <div class="dislike-box hidden" id="dislike-box-${car.id}">
             <textarea placeholder="O que achou deste modelo? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
             <div class="dislike-box-actions">
@@ -148,14 +148,14 @@
         handleVote(car.id, "like");
       });
 
-      // Evento de Dislike (alterna exibição da caixa)
+      // Evento de Dislike
       card.querySelector(".btn-dislike").addEventListener("click", (e) => {
         e.stopPropagation();
         const box = card.querySelector(`#dislike-box-${car.id}`);
         box.classList.toggle("hidden");
       });
 
-      // Envio do comentário para o WhatsApp
+      // Enviar opinião para WhatsApp com link do site
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -292,7 +292,7 @@
       }
     });
 
-    // Controle do Menu Sanduíche Mobile
+    // Menu sanduíche responsivo
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 

@@ -2,20 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Garagem em Miniatura | Coleção de Carrinhos</title>
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=3.1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
- <!-- No <head>: -->
-  <link rel="stylesheet" href="style.css?v=2.2.2" />
-  <script src="data.js?v=2.1.0" defer></script>
-<script src="script.js?v=2.2.2" defer></script>
+  <script src="data.js?v=3.1.0" defer></script>
+  <script src="script.js?v=3.1.0" defer></script>
 </head>
 <body>
 
-  <!-- CABEÇALHO COM MENU SANDUÍCHE -->
+  <!-- CABEÇALHO -->
   <header class="header">
     <div class="container header-container">
       <div class="logo">
@@ -23,14 +21,14 @@
         <span class="logo-text">Garagem<span>Miniatura</span></span>
       </div>
 
-      <!-- BOTÃO SANDUÍCHE (VISÍVEL APENAS NO CELULAR) -->
-      <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+      <!-- BOTÃO SANDUÍCHE (MOBILE) -->
+      <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu de navegação" aria-expanded="false">
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
       </button>
 
-      <!-- LINKS DO MENU -->
+      <!-- MENU DE NAVEGAÇÃO -->
       <nav class="nav" id="nav-menu">
         <a href="#catalogo" class="nav-link">Catálogo</a>
         <a href="#estatisticas" class="nav-link">Estatísticas</a>
@@ -67,7 +65,7 @@
   <section class="catalog-section" id="catalogo">
     <div class="container">
       
-      <!-- BUSCA E BOTÕES DE FILTRO -->
+      <!-- BUSCA E FILTROS -->
       <div class="filter-controls">
         <div class="search-box">
           <span class="search-icon">🔍</span>
@@ -96,27 +94,27 @@
   </section>
 
   <!-- MODAL DE DETALHES -->
-  <div class="modal-overlay" id="car-modal">
+  <div class="modal-overlay" id="car-modal" aria-hidden="true">
     <div class="modal-content">
-      <button class="close-btn" id="modal-close">&times;</button>
+      <button class="close-btn" id="modal-close" aria-label="Fechar janela">&times;</button>
       <div class="modal-body" id="modal-details"></div>
     </div>
   </div>
 
-  <!-- RODAPÉ E IDENTIFICAÇÃO INSTITUCIONAL -->
+  <!-- RODAPÉ INSTITUCIONAL -->
   <footer class="footer" id="sobre">
     <div class="container footer-content">
       <div class="footer-brand">
         <h3>Garagem em Miniatura</h3>
-        <p class="app-subtitle">Controlador da Aplicação v2.2.0</p>
-        <p class="collection-desc">Organização, catalogação interativa e preservação histórica de acervo de veículos em miniatura.</p>
+        <p class="app-subtitle">Controlador da Aplicação v3.1.0</p>
+        <p class="collection-desc">Organização, catalogação interativa e preservação histórica de réplicas automotivas.</p>
       </div>
 
       <div class="footer-credits">
         <span class="developed-by">Desenvolvido por:</span>
         <strong class="lab-name">PereiraLabs</strong>
         <span class="lab-role">Divisão de Tecnologia e IA</span>
-        <span class="parent-company">Louzada & Pereira — Soluções Digitais</span>
+        <span class="parent-company">Louzada & Pereira - Soluções Digitais</span>
       </div>
 
       <div class="footer-bottom">
