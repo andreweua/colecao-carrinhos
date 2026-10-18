@@ -1,16 +1,30 @@
 /**
- * Garagem em Miniatura - Controlador da Aplicação
- * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
- * URL de Produção: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 6.2.1
+ * Garagem em Miniatura - Controlador da Aplicacao
+ * PereiraLabs (divisao da Louzada & Pereira - Solucoes Digitais)
+ * URL de Producao: https://andreweua.github.io/colecao-carrinhos/
+ * Versao: 6.2.2
  */
 
-function iniciarAplicacao() {
-  const WHATSAPP_NUMERO = "5535992344229";
+(function () {
+  "use strict";
 
-  // Garante os dados vindos de CARS_DATA (data.js)
+  const WHATSAPP_NUMERO = "5535992344229";
+  const LOGO_PADRAO = "img/logo-garagem.png";
+
+  // Fallback seguro caso o data.js falhe ou atrase o carregamento
+  const BACKUP_CARS = [
+    { "id": 1, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" }
+  ];
+
+  function getCarrosIniciais() {
+    if (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA) && CARS_DATA.length > 0) {
+      return CARS_DATA;
+    }
+    return BACKUP_CARS;
+  }
+
   const state = {
-    cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
+    cars: getCarrosIniciais(),
     categoryFilter: "todos",
     searchQuery: "",
     selectedImageBase64: null
@@ -43,19 +57,21 @@ function iniciarAplicacao() {
     aiResult: document.getElementById("ai-result")
   };
 
-  const getReactions = () => {
+  function getReactions() {
     try {
       return JSON.parse(localStorage.getItem("garagem_reactions")) || {};
     } catch (e) {
       return {};
     }
-  };
+  }
 
-  const saveReactions = (data) => {
-    localStorage.setItem("garagem_reactions", JSON.stringify(data));
-  };
+  function saveReactions(data) {
+    try {
+      localStorage.setItem("garagem_reactions", JSON.stringify(data));
+    } catch (e) {}
+  }
 
-  const sanitize = (str) => {
+  function sanitize(str) {
     if (!str) return "";
     return String(str)
       .replace(/&/g, "&amp;")
@@ -63,9 +79,9 @@ function iniciarAplicacao() {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
-  };
+  }
 
-  const updateStats = () => {
+  function updateStats() {
     if (dom.totalModelos) dom.totalModelos.textContent = state.cars.length;
     if (dom.totalMarcas) {
       const marcas = new Set(
@@ -75,27 +91,9 @@ function iniciarAplicacao() {
       );
       dom.totalMarcas.textContent = marcas.size;
     }
-  };
+  }
 
-  // Trata erro de carregamento tentando extensões comuns (.jpg, .JPG, .jpeg, .png)
-  window.tratarErroImagem = function(img, carId) {
-    const srcAtual = img.getAttribute("src") || "";
-    if (srcAtual.endsWith(".jpg")) {
-      img.src = `img/${carId}.JPG`;
-    } else if (srcAtual.endsWith(".JPG")) {
-      img.src = `img/${carId}.jpeg`;
-    } else if (srcAtual.endsWith(".jpeg")) {
-      img.src = `img/${carId}.png`;
-    } else {
-      // Se não achar em nenhum formato, esconde a imagem e mostra a logo oficial
-      img.style.display = "none";
-      if (img.nextElementSibling) {
-        img.nextElementSibling.style.display = "flex";
-      }
-    }
-  };
-
-  const renderCars = (carList) => {
+  function renderCars(carList) {
     if (!dom.carsGrid) return;
     dom.carsGrid.innerHTML = "";
 
@@ -116,17 +114,17 @@ function iniciarAplicacao() {
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Busca a foto informada no data.js ou tenta carregar pelo ID: img/[id].jpg
-      const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
+      const hasDirectPhoto = Boolean(car.foto && car.foto.trim() !== "");
+      const fotoPath = hasDirectPhoto ? car.foto : `img/${car.id}.jpg`;
 
-      // Se não tiver foto, exibe diretamente a logo sem textos extras
+      // Se falhar o carregamento da imagem, esconde o <img> e mostra a logo-garagem.png
       const visualNode = `
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              loading="lazy" 
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
         <div class="placeholder-fallback" style="display:none;">
-          <img src="img/logo-garagem.png" alt="Garagem em Miniatura" class="logo-fallback-img">
+          <img src="${LOGO_PADRAO}" alt="Garagem em Miniatura" class="logo-fallback-img">
         </div>`;
 
       card.innerHTML = `
@@ -212,9 +210,9 @@ function iniciarAplicacao() {
     });
 
     dom.carsGrid.appendChild(fragment);
-  };
+  }
 
-  const handleVote = (carId, type, comment = "") => {
+  function handleVote(carId, type, comment = "") {
     const reactions = getReactions();
     if (!reactions[carId]) {
       reactions[carId] = { likes: 0, dislikes: 0, userChoice: null, comment: "" };
@@ -242,21 +240,22 @@ function iniciarAplicacao() {
 
     saveReactions(reactions);
     applyFilters();
-  };
+  }
 
-  const showModal = (car) => {
+  function showModal(car) {
     if (!dom.carModal || !dom.modalDetails) return;
 
-    const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
+    const hasDirectPhoto = Boolean(car.foto && car.foto.trim() !== "");
+    const fotoPath = hasDirectPhoto ? car.foto : `img/${car.id}.jpg`;
 
     const modalVisual = `
       <div class="modal-image-wrapper">
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              class="modal-img" 
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
         <div class="modal-fallback" style="display:none;">
-          <img src="img/logo-garagem.png" alt="Garagem em Miniatura" class="logo-fallback-modal">
+          <img src="${LOGO_PADRAO}" alt="Garagem em Miniatura" class="logo-fallback-modal">
         </div>
       </div>`;
 
@@ -270,21 +269,21 @@ function iniciarAplicacao() {
     `;
 
     openModal(dom.carModal);
-  };
+  }
 
-  const closeModal = (modal) => {
+  function closeModal(modal) {
     if (!modal) return;
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
-  };
+  }
 
-  const openModal = (modal) => {
+  function openModal(modal) {
     if (!modal) return;
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
-  };
+  }
 
-  const applyFilters = () => {
+  function applyFilters() {
     const q = state.searchQuery.toLowerCase().trim();
     const filtered = state.cars.filter((car) => {
       const matchText =
@@ -296,9 +295,9 @@ function iniciarAplicacao() {
       return matchText && matchCategory;
     });
     renderCars(filtered);
-  };
+  }
 
-  const setupAiModule = () => {
+  function setupAiModule() {
     const triggerAi = () => openModal(dom.aiModal);
     dom.cardTriggerAi?.addEventListener("click", triggerAi);
     dom.navBtnAi?.addEventListener("click", triggerAi);
@@ -373,9 +372,9 @@ function iniciarAplicacao() {
         dom.aiStatus.textContent = `❌ Erro: ${err.message}`;
       }
     });
-  };
+  }
 
-  const setupEventListeners = () => {
+  function setupEventListeners() {
     dom.searchInput?.addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
       applyFilters();
@@ -419,15 +418,18 @@ function iniciarAplicacao() {
     }
 
     setupAiModule();
-  };
+  }
 
-  updateStats();
-  renderCars(state.cars);
-  setupEventListeners();
-}
+  function init() {
+    state.cars = getCarrosIniciais();
+    updateStats();
+    renderCars(state.cars);
+    setupEventListeners();
+  }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarAplicacao);
-} else {
-  iniciarAplicacao();
-}
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
