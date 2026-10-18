@@ -1,9 +1,8 @@
 /**
  * Garagem em Miniatura - Controlador da Aplicação
- * PereiraLabs — Divisão de Tecnologia e IA
- * Louzada & Pereira - Soluções Digitais
+ * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 2.2.0
+ * Versão: 2.2.1
  */
 
 (() => {
@@ -88,7 +87,6 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Foto limpa (sem tags flutuantes por cima)
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -115,7 +113,7 @@
             <span class="card-id">#${car.id}</span>
           </div>
 
-          <!-- BOTÕES DE LIKE E DISLIKE -->
+          <!-- BOTÕES DE REAÇÃO -->
           <div class="card-actions">
             <div class="feedback-btns">
               <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
@@ -127,7 +125,7 @@
             </div>
           </div>
 
-          <!-- FORMULÁRIO DE FEEDBACK DO DISLIKE -->
+          <!-- FORMULÁRIO DE FEEDBACK COM LINK DO SITE -->
           <div class="dislike-box hidden" id="dislike-box-${car.id}">
             <textarea placeholder="O que achou deste modelo? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
             <div class="dislike-box-actions">
@@ -144,20 +142,20 @@
       card.querySelector(".card-image").addEventListener("click", openModal);
       card.querySelector(".card-clickable").addEventListener("click", openModal);
 
-      // Ação de Like
+      // Evento de Like
       card.querySelector(".btn-like").addEventListener("click", (e) => {
         e.stopPropagation();
         handleVote(car.id, "like");
       });
 
-      // Ação de Dislike (alterna exibição da caixa de texto)
+      // Evento de Dislike (alterna exibição da caixa)
       card.querySelector(".btn-dislike").addEventListener("click", (e) => {
         e.stopPropagation();
         const box = card.querySelector(`#dislike-box-${car.id}`);
         box.classList.toggle("hidden");
       });
 
-      // Enviar opinião para o WhatsApp com link da coleção
+      // Envio do comentário para o WhatsApp
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -180,7 +178,7 @@
         window.open(url, "_blank");
       });
 
-      // Cancelar envio de dislike
+      // Cancelar envio
       card.querySelector(".btn-mini-cancel").addEventListener("click", (e) => {
         e.stopPropagation();
         card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
@@ -293,18 +291,8 @@
         closeModal();
       }
     });
-  };
 
-  const init = () => {
-    updateStats();
-    renderCars(state.cars);
-    setupEventListeners();
-  };
-
-  init();
-})();
-
-// Controle do Menu Sanduíche no Celular
+    // Controle do Menu Sanduíche Mobile
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
@@ -315,7 +303,6 @@
         menuToggle.setAttribute("aria-expanded", String(isOpen));
       });
 
-      // Fecha o menu automaticamente ao clicar em qualquer link
       navMenu.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", () => {
           navMenu.classList.remove("active");
@@ -324,3 +311,13 @@
         });
       });
     }
+  };
+
+  const init = () => {
+    updateStats();
+    renderCars(state.cars);
+    setupEventListeners();
+  };
+
+  init();
+})();
