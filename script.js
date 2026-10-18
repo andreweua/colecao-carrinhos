@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 4.0.0
+ * Versão: 5.0.0
  */
 
 (() => {
@@ -13,7 +13,8 @@
   const state = {
     cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
     categoryFilter: "todos",
-    searchQuery: ""
+    searchQuery: "",
+    selectedImageBase64: null
   };
 
   const dom = {
@@ -25,7 +26,16 @@
     totalMarcas: document.getElementById("total-marcas"),
     carModal: document.getElementById("car-modal"),
     modalDetails: document.getElementById("modal-details"),
-    modalClose: document.getElementById("modal-close")
+    modalClose: document.getElementById("modal-close"),
+    // IA DOM
+    geminiKeyInput: document.getElementById("gemini-key-input"),
+    btnSaveKey: document.getElementById("btn-save-key"),
+    aiFileInput: document.getElementById("ai-file-input"),
+    aiPreview: document.getElementById("ai-preview"),
+    aiPreviewImg: document.getElementById("ai-preview-img"),
+    btnAnalyzeAi: document.getElementById("btn-analyze-ai"),
+    aiStatus: document.getElementById("ai-status"),
+    aiResult: document.getElementById("ai-result")
   };
 
   const getReactions = () => {
@@ -109,7 +119,6 @@
             <span class="card-id">#${car.id}</span>
           </div>
 
-          <!-- BOTÕES DE REAÇÃO -->
           <div class="card-actions">
             <div class="feedback-btns">
               <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
@@ -121,7 +130,6 @@
             </div>
           </div>
 
-          <!-- FORMULÁRIO DE FEEDBACK -->
           <div class="dislike-box hidden" id="dislike-box-${car.id}">
             <textarea placeholder="O que achou deste modelo? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
             <div class="dislike-box-actions">
@@ -137,20 +145,17 @@
       card.querySelector(".card-image").addEventListener("click", openDetails);
       card.querySelector(".card-clickable").addEventListener("click", openDetails);
 
-      // Evento de Like
       card.querySelector(".btn-like").addEventListener("click", (e) => {
         e.stopPropagation();
         handleVote(car.id, "like");
       });
 
-      // Evento de Dislike
       card.querySelector(".btn-dislike").addEventListener("click", (e) => {
         e.stopPropagation();
         const box = card.querySelector(`#dislike-box-${car.id}`);
         box.classList.toggle("hidden");
       });
 
-      // Enviar opinião para WhatsApp com link do acervo
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -173,7 +178,6 @@
         window.open(url, "_blank");
       });
 
-      // Cancelar envio
       card.querySelector(".btn-mini-cancel").addEventListener("click", (e) => {
         e.stopPropagation();
         card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
@@ -255,6 +259,116 @@
     renderCars(filtered);
   };
 
+  /* INTEGRAÇÃO GEMINI VISION API */
+  const setupAiModule = () => {
+    const savedKey = localStorage.getItem("gemini_api_key");
+    if (savedKey && dom.geminiKeyInput) {
+      dom.geminiKeyInput.value = savedKey;
+    }
+
+    dom.btnSaveKey?.addEventListener("click", () => {
+      const key = dom.geminiKeyInput.value.trim();
+      if (!key) {
+        localStorage.removeItem("gemini_api_key");
+        alert("Chave de API removida!");
+        return;
+      }
+      localStorage.setItem("gemini_api_key", key);
+      alert("Chave salva com sucesso!");
+    });
+
+    dom.aiFileInput?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const fullBase64 = event.target.result;
+        state.selectedImageBase64 = fullBase64.split(",")[1];
+        dom.aiPreviewImg.src = fullBase64;
+        dom.aiPreview.classList.remove("hidden");
+        dom.aiResult.classList.add("hidden");
+        dom.aiStatus.classList.add("hidden");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    dom.btnAnalyzeAi?.addEventListener("click", async () => {
+      const key = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value.trim();
+      if (!key) {
+        alert("Por favor, informe uma chave de API do Google AI Studio antes de analisar.");
+        return;
+      }
+
+      if (!state.selectedImageBase64) {
+        alert("Por favor, selecione uma imagem primeiro.");
+        return;
+      }
+
+      dom.aiStatus.classList.remove("hidden");
+      dom.aiStatus.textContent = "⏳ Analisando miniatura com a IA do Google...";
+      dom.aiResult.classList.add("hidden");
+
+      // Monta lista concisa do catálogo para passar à IA
+      const acervoResumido = state.cars
+        .map((c) => `#${c.id} ${c.marca} ${c.modelo} (${c.ano})`)
+        .join("; ");
+
+      const prompt = `Você é um curador especialista em réplicas de carrinhos em miniatura do projeto Garagem em Miniatura.
+Analise a imagem enviada e determine qual veículo/modelo ela representa (marca, modelo provável, cor e estilo de carroceria).
+Em seguida, compare rigorosamente com o catálogo de 105 veículos que o colecionador já possui:
+[CATÁLOGO: ${acervoResumido}]
+
+Responda em português de forma clara no seguinte formato:
+1. Identificação da Foto: Modelo, marca e detalhes visíveis.
+2. Comparação de Acervo: O colecionador JÁ POSSUI este veículo (ou algum modelo muito próximo)? Se sim, cite o #ID e o nome do carro correspondente no acervo. Se não possuir, confirme que se trata de uma peça inédita.
+3. Veredito para compra: "Peça Inédita - Recomendada" ou "Atenção: Possível Duplicata".`;
+
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    {
+                      inline_data: {
+                        mime_type: "image/jpeg",
+                        data: state.selectedImageBase64
+                      }
+                    }
+                  ]
+                }
+              ]
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.message || "Erro retornado pela API do Google.");
+        }
+
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!candidateText) {
+          throw new Error("Não foi possível gerar a análise da imagem.");
+        }
+
+        dom.aiStatus.classList.add("hidden");
+        dom.aiResult.classList.remove("hidden");
+        dom.aiResult.textContent = candidateText;
+      } catch (err) {
+        dom.aiStatus.classList.remove("hidden");
+        dom.aiStatus.textContent = `❌ Erro na análise: ${err.message}`;
+      }
+    });
+  };
+
   const setupEventListeners = () => {
     if (dom.searchInput) {
       dom.searchInput.addEventListener("input", (e) => {
@@ -287,7 +401,6 @@
       }
     });
 
-    // Menu sanduíche em cascata
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
@@ -306,6 +419,8 @@
         });
       });
     }
+
+    setupAiModule();
   };
 
   const init = () => {
