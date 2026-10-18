@@ -1,0 +1,24 @@
+{
+  "name": "Garagem em Miniatura",
+  "short_name": "GaragemMini",
+  "description": "Catálogo interativo e curadoria de 105 veículos em miniatura - PereiraLabs",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c0e12",
+  "theme_color": "#0c0e12",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
