@@ -300,3 +300,24 @@
 
   init();
 })();
+
+// Controle do Menu Sanduíche no Celular
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
+
+    if (menuToggle && navMenu) {
+      menuToggle.addEventListener("click", () => {
+        const isOpen = navMenu.classList.toggle("active");
+        menuToggle.classList.toggle("active");
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+
+      // Fecha o menu automaticamente ao clicar em qualquer link
+      navMenu.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          navMenu.classList.remove("active");
+          menuToggle.classList.remove("active");
+          menuToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
