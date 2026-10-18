@@ -15,17 +15,26 @@
 </head>
 <body>
 
-  <!-- CABEÇALHO -->
+  <!-- CABEÇALHO COM MENU SANDUÍCHE -->
   <header class="header">
     <div class="container header-container">
       <div class="logo">
         <span class="logo-icon">🏎️</span>
         <span class="logo-text">Garagem<span>Miniatura</span></span>
       </div>
-      <nav class="nav">
-        <a href="#catalogo">Catálogo</a>
-        <a href="#estatisticas">Estatísticas</a>
-        <a href="#sobre">Sobre</a>
+
+      <!-- BOTÃO SANDUÍCHE (VISÍVEL APENAS NO CELULAR) -->
+      <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
+      <!-- LINKS DO MENU -->
+      <nav class="nav" id="nav-menu">
+        <a href="#catalogo" class="nav-link">Catálogo</a>
+        <a href="#estatisticas" class="nav-link">Estatísticas</a>
+        <a href="#sobre" class="nav-link">Sobre</a>
       </nav>
     </div>
   </header>
