@@ -5,7 +5,7 @@
  */
 
 const CARS_DATA = [
-  { "id": 1, "marca": "Ferrari", "modelo": "Sunnyside", "ano": "—", "fabricante": "Sunnyside", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" },
+  { "id": 1, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "Sunnyside", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" },
   { "id": 2, "marca": "Anotação / Miniatura", "modelo": "Katalog Modellauto", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "img/2.jpg" },
   { "id": 3, "marca": "Gurgel", "modelo": "Itaipu E-400 CPT", "ano": "1976", "fabricante": "Welly", "categoria": "Nacional", "icon": "🚙", "foto": "" },
   { "id": 4, "marca": "Ford", "modelo": "Vicky", "ano": "1932", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "img/4.jpg" },
