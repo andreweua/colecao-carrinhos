@@ -119,13 +119,14 @@ function iniciarAplicacao() {
       // Busca a foto informada no data.js ou tenta carregar pelo ID: img/[id].jpg
       const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
 
+      // Se não tiver foto, exibe diretamente a logo sem textos extras
       const visualNode = `
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              loading="lazy" 
-             onerror="window.tratarErroImagem(this, ${car.id});">
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="placeholder-fallback" style="display:none;">
-          <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-img">
+          <img src="img/icon-192.png" alt="" class="logo-fallback-img">
         </div>`;
 
       card.innerHTML = `
