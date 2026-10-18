@@ -44,3 +44,5 @@ Desenvolvido por **PereiraLabs** (divisão da *Louzada & Pereira - Soluções Di
 ├── organizar_fotos.py  # Script de processamento e OCR das imagens
 ├── img/                # Fotografias processadas das miniaturas (1.jpg, ...)
 └── README.md           # Documentação do projeto
+
+https://andreweua.github.io/colecao-carrinhos/
