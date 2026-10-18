@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Garagem em Miniatura | Coleção de Carrinhos</title>
-  <link rel="stylesheet" href="style.css?v=5.2.0" />
+  <link rel="stylesheet" href="style.css?v=5.3.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="data.js?v=5.2.0" defer></script>
-  <script src="script.js?v=5.2.0" defer></script>
+  <script src="data.js?v=5.3.0" defer></script>
+  <script src="script.js?v=5.3.0" defer></script>
 </head>
 <body>
 
@@ -19,6 +19,7 @@
       <div class="logo">
         <span class="logo-icon">🏎️</span>
         <span class="logo-text">Garagem<span>Miniatura</span></span>
+        <span class="version-tag">v5.3.0</span>
       </div>
 
       <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
@@ -30,19 +31,20 @@
       <nav class="nav" id="nav-menu">
         <a href="#catalogo" class="nav-link">Catálogo</a>
         <a href="#estatisticas" class="nav-link">Estatísticas</a>
-        <a href="#ia-scanner" class="nav-link" id="nav-ia-link">Identificar com IA</a>
-        <a href="#sobre" class="nav-link">Sobre</a>
+        <button id="nav-btn-ai" class="nav-btn-link">🤖 IA Scanner</button>
+        <button id="nav-btn-about" class="nav-btn-link">📖 Sobre o Projeto</button>
       </nav>
     </div>
   </header>
 
-  <!-- DESTAQUE PRINCIPAL -->
+  <!-- DESTAQUE PRINCIPAL E ESTATÍSTICAS -->
   <section class="hero">
     <div class="container hero-content">
-      <span class="badge">Coleção Particular</span>
+      <span class="badge">Coleção Particular • PereiraLabs</span>
       <h1>Acervo de Veículos em Miniatura</h1>
       <p>Catálogo interativo reunindo clássicos, muscle cars, modelos nacionais e superesportivos.</p>
       
+      <!-- GRID DE MÉTRICAS COM CARD DE ACIONAMENTO DA IA -->
       <div class="stats-bar" id="estatisticas">
         <div class="stat-card">
           <span class="stat-num" id="total-modelos">0</span>
@@ -56,49 +58,11 @@
           <span class="stat-num">1929 – 2019</span>
           <span class="stat-label">Período Histórico</span>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SEÇÃO DE IDENTIFICAÇÃO COM IA (ABRE APENAS APÓS O CLIQUE) -->
-  <section class="ai-section" id="ia-scanner">
-    <div class="container">
-      <div class="ai-card">
-        
-        <!-- CABEÇALHO DO SCANNER COM BOTÃO DE ACIONAMENTO -->
-        <div class="ai-header">
-          <span class="ai-badge">Google Gemini Vision (gemini-3.8-flash)</span>
-          <h2>🔍 Comparador Visual Inteligente</h2>
-          <p>Tire uma foto ou carregue uma imagem para saber se a miniatura já faz parte dos 105 veículos do acervo ou se é uma peça inédita.</p>
-          
-          <button id="btn-toggle-ia" class="btn-toggle-ia">
-            🤖 Identificar com IA
-          </button>
+        <!-- 4º CARD: ACIONADOR DO SCANNER DE IA -->
+        <div class="stat-card stat-card-ai" id="card-trigger-ai" role="button" tabindex="0" title="Clique para identificar miniaturas com IA">
+          <span class="stat-num">🤖 IA</span>
+          <span class="stat-label stat-label-highlight">Identificar com IA ➔</span>
         </div>
-
-        <!-- PAINEL OCULTO QUE SÓ APARECE APÓS CLICAR NO BOTÃO ACIMA -->
-        <div id="ai-body-wrapper" class="ai-body-wrapper hidden">
-          <div class="ai-controls">
-            <div class="key-container">
-              <input type="password" id="gemini-key-input" placeholder="Cole sua Chave da API do Google AI Studio..." />
-              <button id="btn-save-key" class="btn-secondary">Salvar Chave</button>
-            </div>
-            
-            <div class="upload-area">
-              <input type="file" id="ai-file-input" accept="image/*" capture="environment" class="file-input-hidden" />
-              <label for="ai-file-input" class="btn-primary">📸 Tirar Foto ou Carregar Arquivo</label>
-              
-              <div id="ai-preview" class="ai-preview hidden">
-                <img id="ai-preview-img" alt="Prévia da foto selecionada" />
-                <button id="btn-analyze-ai" class="btn-accent">Analisar com IA</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="ai-status" class="ai-status hidden"></div>
-          <div id="ai-result" class="ai-result hidden"></div>
-        </div>
-
       </div>
     </div>
   </section>
@@ -133,7 +97,7 @@
     </div>
   </section>
 
-  <!-- MODAL DE DETALHES -->
+  <!-- MODAL DE DETALHES DO CARRO -->
   <div class="modal-overlay" id="car-modal" aria-hidden="true">
     <div class="modal-content">
       <button class="close-btn" id="modal-close" aria-label="Fechar janela">&times;</button>
@@ -141,13 +105,91 @@
     </div>
   </div>
 
-  <!-- RODAPÉ INSTITUCIONAL -->
+  <!-- MODAL DO SCANNER DE IA (DISPARADO PELO CARD OU PELO MENU) -->
+  <div class="modal-overlay" id="ai-modal" aria-hidden="true">
+    <div class="modal-content modal-ai-content">
+      <button class="close-btn" id="ai-modal-close" aria-label="Fechar janela">&times;</button>
+      
+      <div class="ai-modal-header">
+        <span class="ai-badge">Google Gemini Vision (gemini-3.8-flash)</span>
+        <h2>🔍 Comparador com o Acervo</h2>
+        <p>Tire uma foto ou carregue um arquivo para saber se a miniatura já existe na coleção ou se é uma peça inédita.</p>
+      </div>
+
+      <div class="ai-modal-controls">
+        <div class="key-container">
+          <input type="password" id="gemini-key-input" placeholder="Cole sua Chave da API do Google AI Studio..." />
+          <button id="btn-save-key" class="btn-secondary">Salvar Chave</button>
+        </div>
+
+        <div class="upload-area">
+          <input type="file" id="ai-file-input" accept="image/*" capture="environment" class="file-input-hidden" />
+          <label for="ai-file-input" class="btn-primary">📸 Tirar Foto / Carregar Arquivo</label>
+          
+          <div id="ai-preview" class="ai-preview hidden">
+            <img id="ai-preview-img" alt="Prévia da foto selecionada" />
+            <button id="btn-analyze-ai" class="btn-accent">Analisar com IA</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="ai-status" class="ai-status hidden"></div>
+      <div id="ai-result" class="ai-result hidden"></div>
+    </div>
+  </div>
+
+  <!-- MODAL SOBRE O PROJETO / DOCUMENTAÇÃO (OPÇÃO 1) -->
+  <div class="modal-overlay" id="about-modal" aria-hidden="true">
+    <div class="modal-content modal-about-content">
+      <button class="close-btn" id="about-modal-close" aria-label="Fechar janela">&times;</button>
+      
+      <div class="about-header">
+        <span class="badge">Documentação Técnica</span>
+        <h2>🏎️ Garagem em Miniatura</h2>
+        <p class="app-subtitle">Controlador da Aplicação v5.3.0</p>
+      </div>
+
+      <div class="about-body">
+        <h3>📋 Visão Geral</h3>
+        <p>Sistema digital desenvolvido para catalogação, preservação histórica, filtragem e avaliação interativa de um acervo de 105 veículos em miniatura.</p>
+
+        <h3>⚡ Tecnologias e Recursos</h3>
+        <ul>
+          <li><strong>Catálogo Dinâmico:</strong> Grid responsivo com busca instantânea e filtros por categorias clássicas, nacionais, esportivos e utilitários.</li>
+          <li><strong>Visão Computacional:</strong> Comparação visual em tempo real contra os 105 itens via Google Gemini Vision API (<code>gemini-3.8-flash</code>).</li>
+          <li><strong>Canal de Curadoria:</strong> Sistema de Like/Dislike com mensagem pré-formatada direta para WhatsApp.</li>
+          <li><strong>Privacidade:</strong> Armazenamento local das chaves e preferências no <code>localStorage</code> do usuário.</li>
+        </ul>
+
+        <h3>🏢 Engenharia & Créditos</h3>
+        <p><strong>PereiraLabs</strong> — Divisão de Tecnologia e IA<br>
+        <strong>Louzada & Pereira - Soluções Digitais</strong><br>
+        URL de Produção: <a href="https://andreweua.github.io/colecao-carrinhos/" target="_blank">andreweua.github.io/colecao-carrinhos/</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RODAPÉ INSTITUCIONAL COM ACCORDION RETRÁTIL (OPÇÃO 2) -->
   <footer class="footer" id="sobre">
     <div class="container footer-content">
+      
+      <!-- OPÇÃO 2: ACCORDION RETRÁTIL DE DOCUMENTAÇÃO -->
+      <details class="readme-accordion">
+        <summary>📄 Notas da Versão e Especificações do Projeto (v5.3.0)</summary>
+        <div class="readme-accordion-body">
+          <p><strong>Garagem em Miniatura</strong> é uma aplicação estática mobile-first com curadoria de 105 modelos réplicas automotivas[cite: 3, 4, 5, 6].</p>
+          <ul>
+            <li><strong>Reconhecimento Visual:</strong> IA integrada para verificação de duplicidade de aquisições.</li>
+            <li><strong>Armazenamento:</strong> <code>localStorage</code> para contagem e chave de acesso.</li>
+            <li><strong>Desenvolvedor:</strong> PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais).</li>
+          </ul>
+        </div>
+      </details>
+
       <div class="footer-brand">
         <h3>Garagem em Miniatura</h3>
-        <p class="app-subtitle">Controlador da Aplicação v5.2.0</p>
-        <p class="collection-desc">Organização, catalogação interativa e preservação histórica de réplicas automotivas.</p>
+        <p class="app-subtitle">Controlador da Aplicação v5.3.0</p>
+        <p class="collection-desc">Organização, catalogação interativa e preservação histórica de réplicas automotivas[cite: 3, 4, 5, 6].</p>
       </div>
 
       <div class="footer-credits">

@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 5.2.0
+ * Versão: 5.3.0
  */
 
 (() => {
@@ -24,13 +24,22 @@
     noResults: document.getElementById("no-results"),
     totalModelos: document.getElementById("total-modelos"),
     totalMarcas: document.getElementById("total-marcas"),
+    
+    // Modal Carro
     carModal: document.getElementById("car-modal"),
     modalDetails: document.getElementById("modal-details"),
     modalClose: document.getElementById("modal-close"),
-    // IA DOM
-    btnToggleIa: document.getElementById("btn-toggle-ia"),
-    aiBodyWrapper: document.getElementById("ai-body-wrapper"),
-    navIaLink: document.getElementById("nav-ia-link"),
+
+    // Modal Sobre
+    aboutModal: document.getElementById("about-modal"),
+    aboutModalClose: document.getElementById("about-modal-close"),
+    navBtnAbout: document.getElementById("nav-btn-about"),
+
+    // Modal e Controles de IA
+    aiModal: document.getElementById("ai-modal"),
+    aiModalClose: document.getElementById("ai-modal-close"),
+    cardTriggerAi: document.getElementById("card-trigger-ai"),
+    navBtnAi: document.getElementById("nav-btn-ai"),
     geminiKeyInput: document.getElementById("gemini-key-input"),
     btnSaveKey: document.getElementById("btn-save-key"),
     aiFileInput: document.getElementById("ai-file-input"),
@@ -242,10 +251,16 @@
     dom.carModal.setAttribute("aria-hidden", "false");
   };
 
-  const closeModal = () => {
-    if (!dom.carModal) return;
-    dom.carModal.classList.remove("active");
-    dom.carModal.setAttribute("aria-hidden", "true");
+  const closeModal = (modalElement) => {
+    if (!modalElement) return;
+    modalElement.classList.remove("active");
+    modalElement.setAttribute("aria-hidden", "true");
+  };
+
+  const openModal = (modalElement) => {
+    if (!modalElement) return;
+    modalElement.classList.add("active");
+    modalElement.setAttribute("aria-hidden", "false");
   };
 
   const applyFilters = () => {
@@ -262,21 +277,16 @@
     renderCars(filtered);
   };
 
-  /* CONTROLE DO MÓDULO DE IA (GEMINI 3.8 FLASH SOB DEMANDA) */
+  /* INTEGRAÇÃO COM GEMINI 3.8 FLASH NO MODAL */
   const setupAiModule = () => {
-    const togglePanel = () => {
-      if (!dom.aiBodyWrapper) return;
-      const isHidden = dom.aiBodyWrapper.classList.toggle("hidden");
-      if (dom.btnToggleIa) {
-        dom.btnToggleIa.textContent = isHidden ? "🤖 Identificar com IA" : "Fechar Painel de IA";
-      }
-    };
+    // Abrir Modal de IA
+    const triggerAi = () => openModal(dom.aiModal);
+    dom.cardTriggerAi?.addEventListener("click", triggerAi);
+    dom.navBtnAi?.addEventListener("click", triggerAi);
 
-    dom.btnToggleIa?.addEventListener("click", togglePanel);
-    dom.navIaLink?.addEventListener("click", () => {
-      if (dom.aiBodyWrapper?.classList.contains("hidden")) {
-        togglePanel();
-      }
+    dom.aiModalClose?.addEventListener("click", () => closeModal(dom.aiModal));
+    dom.aiModal?.addEventListener("click", (e) => {
+      if (e.target === dom.aiModal) closeModal(dom.aiModal);
     });
 
     const savedKey = localStorage.getItem("gemini_api_key");
@@ -314,12 +324,12 @@
     dom.btnAnalyzeAi?.addEventListener("click", async () => {
       const key = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value.trim();
       if (!key) {
-        alert("Por favor, informe uma chave de API do Google AI Studio antes de analisar.");
+        alert("Por favor, informe sua chave da Google AI Studio antes de analisar.");
         return;
       }
 
       if (!state.selectedImageBase64) {
-        alert("Por favor, selecione uma imagem primeiro.");
+        alert("Por favor, tire uma foto ou selecione uma imagem.");
         return;
       }
 
@@ -405,16 +415,24 @@ Responda em português de forma clara no seguinte formato:
       });
     }
 
-    if (dom.modalClose) dom.modalClose.addEventListener("click", closeModal);
-    if (dom.carModal) {
-      dom.carModal.addEventListener("click", (e) => {
-        if (e.target === dom.carModal) closeModal();
-      });
-    }
+    // Modal Carro
+    dom.modalClose?.addEventListener("click", () => closeModal(dom.carModal));
+    dom.carModal?.addEventListener("click", (e) => {
+      if (e.target === dom.carModal) closeModal(dom.carModal);
+    });
+
+    // Modal Sobre o Projeto (Opção 1)
+    dom.navBtnAbout?.addEventListener("click", () => openModal(dom.aboutModal));
+    dom.aboutModalClose?.addEventListener("click", () => closeModal(dom.aboutModal));
+    dom.aboutModal?.addEventListener("click", (e) => {
+      if (e.target === dom.aboutModal) closeModal(dom.aboutModal);
+    });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && dom.carModal?.classList.contains("active")) {
-        closeModal();
+      if (e.key === "Escape") {
+        closeModal(dom.carModal);
+        closeModal(dom.aiModal);
+        closeModal(dom.aboutModal);
       }
     });
 
@@ -428,7 +446,7 @@ Responda em português de forma clara no seguinte formato:
         menuToggle.setAttribute("aria-expanded", String(isOpen));
       });
 
-      navMenu.querySelectorAll(".nav-link").forEach((link) => {
+      navMenu.querySelectorAll(".nav-link, .nav-btn-link").forEach((link) => {
         link.addEventListener("click", () => {
           navMenu.classList.remove("active");
           menuToggle.classList.remove("active");
