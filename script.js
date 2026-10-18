@@ -1,7 +1,9 @@
 /**
  * Garagem em Miniatura - Controlador da Aplicação
- * PereiraLabs (divisão da Louzada&Pereira - Soluções Digitais)
- * Versão: 2.1.0
+ * PereiraLabs — Divisão de Tecnologia e IA
+ * Louzada & Pereira - Soluções Digitais
+ * URL: https://andreweua.github.io/colecao-carrinhos/
+ * Versão: 2.2.0
  */
 
 (() => {
