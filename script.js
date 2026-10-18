@@ -106,12 +106,15 @@
       card.setAttribute("data-id", car.id);
 
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
-      const visualNode = hasPhoto
-        ? `<img src="${encodeURI(car.foto)}" 
-                alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
-                loading="lazy" 
-                onerror="this.onerror=null; this.parentElement.innerHTML='<span>${car.icon || "🚗"}</span>';">`
-        : `<span>${car.icon || "🚗"}</span>`;
+      // NOVO: Exibe o ícone oficial da Garagem em Miniatura quando não houver foto
+const visualNode = hasPhoto
+  ? `<img src="${encodeURI(car.foto)}" 
+          alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+          loading="lazy" 
+          onerror="this.onerror=null; this.src='img/icon-192.png';">`
+  : `<img src="img/icon-192.png" 
+          alt="Sem foto disponível" 
+          class="placeholder-icon" />`;
 
       card.innerHTML = `
         <div class="card-image" role="button" aria-label="Ver detalhes de ${car.modelo}">
