@@ -105,13 +105,21 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
-      const visualNode = hasPhoto
-        ? `<img src="${encodeURI(car.foto)}" 
-                alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
-                loading="lazy" 
-                onerror="this.onerror=null; this.parentElement.innerHTML='<span>${car.icon || "🚗"}</span>';">`
-        : `<span>${car.icon || "🚗"}</span>`;
+      // Define o caminho da foto: se car.foto estiver preenchido usa ele, 
+      // senão tenta buscar automaticamente pelo ID na pasta img/ (ex: img/1.jpg)
+      const fotoPath = (car.foto && car.foto.trim() !== "") 
+        ? car.foto 
+        : `img/${car.id}.jpg`;
+
+      const visualNode = `
+        <img src="${encodeURI(fotoPath)}" 
+             alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+             loading="lazy" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder-fallback" style="display:none;">
+          <span class="fallback-icon">${car.icon || "🏎️"}</span>
+          <span class="fallback-text">GaragemMini</span>
+        </div>`;
 
       card.innerHTML = `
         <div class="card-image" role="button" aria-label="Ver detalhes de ${car.modelo}">
