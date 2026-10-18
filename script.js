@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 5.0.0
+ * Versão: 5.1.0
  */
 
 (() => {
@@ -27,7 +27,6 @@
     carModal: document.getElementById("car-modal"),
     modalDetails: document.getElementById("modal-details"),
     modalClose: document.getElementById("modal-close"),
-    // IA DOM
     geminiKeyInput: document.getElementById("gemini-key-input"),
     btnSaveKey: document.getElementById("btn-save-key"),
     aiFileInput: document.getElementById("ai-file-input"),
@@ -259,7 +258,7 @@
     renderCars(filtered);
   };
 
-  /* INTEGRAÇÃO GEMINI VISION API */
+  /* INTEGRAÇÃO COM GEMINI 3.8 FLASH */
   const setupAiModule = () => {
     const savedKey = localStorage.getItem("gemini_api_key");
     if (savedKey && dom.geminiKeyInput) {
@@ -306,10 +305,9 @@
       }
 
       dom.aiStatus.classList.remove("hidden");
-      dom.aiStatus.textContent = "⏳ Analisando miniatura com a IA do Google...";
+      dom.aiStatus.textContent = "⏳ Analisando miniatura com a IA do Google (gemini-3.8-flash)...";
       dom.aiResult.classList.add("hidden");
 
-      // Monta lista concisa do catálogo para passar à IA
       const acervoResumido = state.cars
         .map((c) => `#${c.id} ${c.marca} ${c.modelo} (${c.ano})`)
         .join("; ");
@@ -326,7 +324,7 @@ Responda em português de forma clara no seguinte formato:
 
       try {
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
