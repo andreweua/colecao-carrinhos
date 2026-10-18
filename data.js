@@ -7,7 +7,7 @@
 
 const CARS_DATA = [
   { "id": 1, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" },
-  { "id": 2, "marca": "Larven", "modelo": "Modellauto Katalog", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "" },
+  { "id": 2, "marca": "Yellow Cab", "modelo": "Táxi Americano", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "" },
   { "id": 3, "marca": "Gurgel", "modelo": "Itaipu E-400 Telerj Rio de Janeiro Cpt", "ano": "1976", "fabricante": "Welly", "categoria": "Nacional", "icon": "🚗", "foto": "" },
   { "id": 4, "marca": "Ford", "modelo": "Vicky", "ano": "1932", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
   { "id": 5, "marca": "Fiat", "modelo": "Idea", "ano": "2003", "fabricante": "—", "categoria": "Nacional", "icon": "🚗", "foto": "" },
