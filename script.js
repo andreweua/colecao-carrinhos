@@ -1,4 +1,3 @@
-// Base completa com os 105 carrinhos catalogados (30 + 30 + 30 + 10)
 /**
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada&Pereira - Soluções Digitais)
