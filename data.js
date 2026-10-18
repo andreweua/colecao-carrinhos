@@ -1,13 +1,13 @@
 /**
- * Garagem em Miniatura - Controlador da Aplicação
- * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
- * URL de Produção: https://andreweua.github.io/colecao-carrinhos/
- * Base de Dados do Catálogo - v6.2.0
+ * Garagem em Miniatura - Controlador da Aplicacao
+ * PereiraLabs (divisao da Louzada & Pereira - Solucoes Digitais)
+ * URL de Producao: https://andreweua.github.io/colecao-carrinhos/
+ * Base de Dados do Catalogo - v6.3.0
  */
 
 const CARS_DATA = [
   { "id": 1, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" },
-  { "id": 2, "marca": "Yellow Cab", "modelo": "Táxi Americano", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "" },
+  { "id": 2, "marca": "Larven", "modelo": "Modellauto Katalog", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "" },
   { "id": 3, "marca": "Gurgel", "modelo": "Itaipu E-400 Telerj Rio de Janeiro Cpt", "ano": "1976", "fabricante": "Welly", "categoria": "Nacional", "icon": "🚗", "foto": "" },
   { "id": 4, "marca": "Ford", "modelo": "Vicky", "ano": "1932", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
   { "id": 5, "marca": "Fiat", "modelo": "Idea", "ano": "2003", "fabricante": "—", "categoria": "Nacional", "icon": "🚗", "foto": "" },
@@ -87,28 +87,4 @@ const CARS_DATA = [
   { "id": 79, "marca": "Volkswagen", "modelo": "Fusca Polícia Federal", "ano": "1967", "fabricante": "—", "categoria": "Viatura / Serviço", "icon": "🚓", "foto": "" },
   { "id": 80, "marca": "Subaru", "modelo": "Impreza WRC", "ano": "2007", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
   { "id": 81, "marca": "Land Rover", "modelo": "Defender", "ano": "—", "fabricante": "—", "categoria": "Utilitário", "icon": "🛻", "foto": "" },
-  { "id": 82, "marca": "Chevrolet", "modelo": "Camaro", "ano": "1969", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 83, "marca": "Alfa Romeo", "modelo": "FNM JK 2000", "ano": "1967", "fabricante": "—", "categoria": "Nacional", "icon": "🚗", "foto": "" },
-  { "id": 84, "marca": "Cadillac", "modelo": "Modelo a Identificar", "ano": "1953", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
-  { "id": 85, "marca": "Toyota", "modelo": "FJ Cruiser", "ano": "—", "fabricante": "—", "categoria": "Utilitário", "icon": "🛻", "foto": "" },
-  { "id": 86, "marca": "Lada", "modelo": "Samara Sedan", "ano": "1991", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
-  { "id": 87, "marca": "Ford", "modelo": "Mustang GT", "ano": "2006", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 88, "marca": "Bentley", "modelo": "Continental GT", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 89, "marca": "Porsche", "modelo": "356 Carrera", "ano": "—", "fabricante": "—", "categoria": "Clássico", "icon": "🏎️", "foto": "" },
-  { "id": 90, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 91, "marca": "Mercedes-Benz", "modelo": "350", "ano": "—", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
-  { "id": 92, "marca": "BMW", "modelo": "Modelo a Identificar", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 93, "marca": "Bugatti", "modelo": "16C Galibier", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 94, "marca": "Cadillac", "modelo": "Fleetwood", "ano": "—", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },
-  { "id": 95, "marca": "Chevrolet", "modelo": "El Camino", "ano": "1965", "fabricante": "—", "categoria": "Utilitário", "icon": "🛻", "foto": "" },
-  { "id": 96, "marca": "Dodge", "modelo": "Charger", "ano": "—", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 97, "marca": "Chevrolet", "modelo": "Impala SS", "ano": "1964", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 98, "marca": "Dodge", "modelo": "Ram 1500", "ano": "2019", "fabricante": "—", "categoria": "Utilitário", "icon": "🛻", "foto": "" },
-  { "id": 99, "marca": "Ferrari", "modelo": "275 GTB", "ano": "1966", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 100, "marca": "Renault", "modelo": "Gordini", "ano": "1965", "fabricante": "—", "categoria": "Nacional", "icon": "🚗", "foto": "" },
-  { "id": 101, "marca": "Ford", "modelo": "Picape", "ano": "1932", "fabricante": "—", "categoria": "Utilitário", "icon": "🛻", "foto": "" },
-  { "id": 102, "marca": "Ford", "modelo": "Mustang", "ano": "1964", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 103, "marca": "Chevrolet", "modelo": "Corvette Stingray", "ano": "1963", "fabricante": "—", "categoria": "Muscle Car", "icon": "🏎️", "foto": "" },
-  { "id": 104, "marca": "Porsche", "modelo": "911 GT3 RS", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
-  { "id": 105, "marca": "McLaren", "modelo": "Senna", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "" }
-];
+  { "id": 82, "marca": "Chevrolet", "modelo": "Camaro", "ano": "1969", "fabricante": "—
