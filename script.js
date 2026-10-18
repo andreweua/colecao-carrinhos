@@ -157,7 +157,7 @@
         box.classList.toggle("hidden");
       });
 
-      // Enviar opinião para o WhatsApp
+      // Enviar opinião para o WhatsApp com link da coleção
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -173,7 +173,8 @@
 
         const msg = `*Feedback Coleção de Carrinhos*\n` +
                     `🏎️ *Item:* #${car.id} - ${car.marca} ${car.modelo} (${car.ano})\n` +
-                    `💬 *Opinião:* "${comentario}"`;
+                    `💬 *Opinião:* "${comentario}"\n\n` +
+                    `🔗 *Acesse o catálogo:* https://andreweua.github.io/colecao-carrinhos/`;
 
         const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
         window.open(url, "_blank");
