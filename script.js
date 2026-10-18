@@ -242,9 +242,27 @@
   const showModal = (car) => {
     if (!dom.carModal || !dom.modalDetails) return;
 
-    const modalVisual = car.foto && car.foto.trim() !== ""
-      ? `<img src="${encodeURI(car.foto)}" alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" class="modal-img">`
-      : "";
+    const fotoPath = (car.foto && car.foto.trim() !== "") 
+      ? car.foto 
+      : `img/${car.id}.jpg`;
+
+    const modalVisual = `
+      <img src="${encodeURI(fotoPath)}" 
+           alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+           class="modal-img" 
+           onerror="this.style.display='none';">`;
+
+    dom.modalDetails.innerHTML = `
+      ${modalVisual}
+      <h2>${sanitize(car.marca)} ${sanitize(car.modelo)}</h2>
+      <div class="detail-row"><span>Número no Acervo:</span> <strong>#${car.id}</strong></div>
+      <div class="detail-row"><span>Ano de Fabricação:</span> <strong>${sanitize(car.ano)}</strong></div>
+      <div class="detail-row"><span>Categoria:</span> <strong>${sanitize(car.categoria)}</strong></div>
+      <div class="detail-row"><span>Fabricante da Miniatura:</span> <strong>${sanitize(car.fabricante)}</strong></div>
+    `;
+
+    openModal(dom.carModal);
+  };
 
     dom.modalDetails.innerHTML = `
       ${modalVisual}
