@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 5.1.0
+ * Versão: 5.2.0
  */
 
 (() => {
@@ -27,6 +27,10 @@
     carModal: document.getElementById("car-modal"),
     modalDetails: document.getElementById("modal-details"),
     modalClose: document.getElementById("modal-close"),
+    // IA DOM
+    btnToggleIa: document.getElementById("btn-toggle-ia"),
+    aiBodyWrapper: document.getElementById("ai-body-wrapper"),
+    navIaLink: document.getElementById("nav-ia-link"),
     geminiKeyInput: document.getElementById("gemini-key-input"),
     btnSaveKey: document.getElementById("btn-save-key"),
     aiFileInput: document.getElementById("ai-file-input"),
@@ -258,8 +262,23 @@
     renderCars(filtered);
   };
 
-  /* INTEGRAÇÃO COM GEMINI 3.8 FLASH */
+  /* CONTROLE DO MÓDULO DE IA (GEMINI 3.8 FLASH SOB DEMANDA) */
   const setupAiModule = () => {
+    const togglePanel = () => {
+      if (!dom.aiBodyWrapper) return;
+      const isHidden = dom.aiBodyWrapper.classList.toggle("hidden");
+      if (dom.btnToggleIa) {
+        dom.btnToggleIa.textContent = isHidden ? "🤖 Identificar com IA" : "Fechar Painel de IA";
+      }
+    };
+
+    dom.btnToggleIa?.addEventListener("click", togglePanel);
+    dom.navIaLink?.addEventListener("click", () => {
+      if (dom.aiBodyWrapper?.classList.contains("hidden")) {
+        togglePanel();
+      }
+    });
+
     const savedKey = localStorage.getItem("gemini_api_key");
     if (savedKey && dom.geminiKeyInput) {
       dom.geminiKeyInput.value = savedKey;

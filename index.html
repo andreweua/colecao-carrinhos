@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Garagem em Miniatura | Coleção de Carrinhos</title>
-<link rel="stylesheet" href="style.css?v=5.1.0" />
-  <script src="data.js?v=5.1.0" defer></script>
-  <script src="script.js?v=5.1.0" defer></script>
+  <link rel="stylesheet" href="style.css?v=5.2.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="data.js?v=5.0.0" defer></script>
-  <script src="script.js?v=5.0.0" defer></script>
+  <script src="data.js?v=5.2.0" defer></script>
+  <script src="script.js?v=5.2.0" defer></script>
 </head>
 <body>
 
@@ -32,7 +30,7 @@
       <nav class="nav" id="nav-menu">
         <a href="#catalogo" class="nav-link">Catálogo</a>
         <a href="#estatisticas" class="nav-link">Estatísticas</a>
-        <a href="#ia-scanner" class="nav-link">Identificar com IA</a>
+        <a href="#ia-scanner" class="nav-link" id="nav-ia-link">Identificar com IA</a>
         <a href="#sobre" class="nav-link">Sobre</a>
       </nav>
     </div>
@@ -62,34 +60,45 @@
     </div>
   </section>
 
-  <!-- SEÇÃO DE IDENTIFICAÇÃO COM IA -->
+  <!-- SEÇÃO DE IDENTIFICAÇÃO COM IA (ABRE APENAS APÓS O CLIQUE) -->
   <section class="ai-section" id="ia-scanner">
     <div class="container">
       <div class="ai-card">
+        
+        <!-- CABEÇALHO DO SCANNER COM BOTÃO DE ACIONAMENTO -->
         <div class="ai-header">
-          <span class="ai-badge">Google Gemini Vision</span>
-          <h2>🔍 Comparar Carrinho com o Acervo</h2>
-          <p>Tire uma foto ou envie uma imagem de uma miniatura nova para saber se ela já existe na coleção ou se é uma peça inédita.</p>
+          <span class="ai-badge">Google Gemini Vision (gemini-3.8-flash)</span>
+          <h2>🔍 Comparador Visual Inteligente</h2>
+          <p>Tire uma foto ou carregue uma imagem para saber se a miniatura já faz parte dos 105 veículos do acervo ou se é uma peça inédita.</p>
+          
+          <button id="btn-toggle-ia" class="btn-toggle-ia">
+            🤖 Identificar com IA
+          </button>
         </div>
 
-        <div class="ai-controls">
-          <div class="key-container">
-            <input type="password" id="gemini-key-input" placeholder="Insira sua Chave de API Google AI Studio" />
-            <button id="btn-save-key" class="btn-secondary">Salvar Chave</button>
-          </div>
-          
-          <div class="upload-area">
-            <input type="file" id="ai-file-input" accept="image/*" capture="environment" class="file-input-hidden" />
-            <label for="ai-file-input" class="btn-primary">📸 Tirar Foto ou Carregar Miniatura</label>
-            <div id="ai-preview" class="ai-preview hidden">
-              <img id="ai-preview-img" alt="Prévia da foto" />
-              <button id="btn-analyze-ai" class="btn-accent">Analisar com IA</button>
+        <!-- PAINEL OCULTO QUE SÓ APARECE APÓS CLICAR NO BOTÃO ACIMA -->
+        <div id="ai-body-wrapper" class="ai-body-wrapper hidden">
+          <div class="ai-controls">
+            <div class="key-container">
+              <input type="password" id="gemini-key-input" placeholder="Cole sua Chave da API do Google AI Studio..." />
+              <button id="btn-save-key" class="btn-secondary">Salvar Chave</button>
+            </div>
+            
+            <div class="upload-area">
+              <input type="file" id="ai-file-input" accept="image/*" capture="environment" class="file-input-hidden" />
+              <label for="ai-file-input" class="btn-primary">📸 Tirar Foto ou Carregar Arquivo</label>
+              
+              <div id="ai-preview" class="ai-preview hidden">
+                <img id="ai-preview-img" alt="Prévia da foto selecionada" />
+                <button id="btn-analyze-ai" class="btn-accent">Analisar com IA</button>
+              </div>
             </div>
           </div>
+
+          <div id="ai-status" class="ai-status hidden"></div>
+          <div id="ai-result" class="ai-result hidden"></div>
         </div>
 
-        <div id="ai-status" class="ai-status hidden"></div>
-        <div id="ai-result" class="ai-result hidden"></div>
       </div>
     </div>
   </section>
@@ -137,7 +146,7 @@
     <div class="container footer-content">
       <div class="footer-brand">
         <h3>Garagem em Miniatura</h3>
-        <p class="app-subtitle">Controlador da Aplicação v5.0.0</p>
+        <p class="app-subtitle">Controlador da Aplicação v5.2.0</p>
         <p class="collection-desc">Organização, catalogação interativa e preservação histórica de réplicas automotivas.</p>
       </div>
 
