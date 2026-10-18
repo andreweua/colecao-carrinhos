@@ -126,7 +126,7 @@ function iniciarAplicacao() {
              loading="lazy" 
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="placeholder-fallback" style="display:none;">
-          <img src="img/icon-192.png" alt="" class="logo-fallback-img">
+          <img src="img/logo-garagem.png" alt="Garagem em Miniatura" class="logo-fallback-img">
         </div>`;
 
       card.innerHTML = `
@@ -254,9 +254,9 @@ function iniciarAplicacao() {
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              class="modal-img" 
-             onerror="window.tratarErroImagem(this, ${car.id});">
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="modal-fallback" style="display:none;">
-          <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-modal">
+          <img src="img/logo-garagem.png" alt="Garagem em Miniatura" class="logo-fallback-modal">
         </div>
       </div>`;
 
