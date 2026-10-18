@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicacao
  * PereiraLabs (divisao da Louzada & Pereira - Solucoes Digitais)
  * URL de Producao: https://andreweua.github.io/colecao-carrinhos/
- * Versao: 7.0.0
+ * Versao: 7.0.1
  */
 
 (function () {
@@ -11,39 +11,19 @@
   const WHATSAPP_NUMERO = "5535992344229";
   const LOGO_PADRAO = "img/logo-garagem.png";
 
+  function getCarrosDisponiveis() {
+    if (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) {
+      return CARS_DATA;
+    }
+    return [];
+  }
+
   const state = {
-    cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
+    cars: getCarrosDisponiveis(),
     categoryFilter: "todos",
     searchQuery: "",
     selectedImageBase64: null,
     selectedImageMime: "image/jpeg"
-  };
-
-  const dom = {
-    carsGrid: document.getElementById("cars-grid"),
-    searchInput: document.getElementById("search-input"),
-    categoryFilters: document.getElementById("category-filters"),
-    noResults: document.getElementById("no-results"),
-    totalModelos: document.getElementById("total-modelos"),
-    totalMarcas: document.getElementById("total-marcas"),
-    carModal: document.getElementById("car-modal"),
-    modalDetails: document.getElementById("modal-details"),
-    modalClose: document.getElementById("modal-close"),
-    aboutModal: document.getElementById("about-modal"),
-    aboutModalClose: document.getElementById("about-modal-close"),
-    navBtnAbout: document.getElementById("nav-btn-about"),
-    aiModal: document.getElementById("ai-modal"),
-    aiModalClose: document.getElementById("ai-modal-close"),
-    cardTriggerAi: document.getElementById("card-trigger-ai"),
-    navBtnAi: document.getElementById("nav-btn-ai"),
-    geminiKeyInput: document.getElementById("gemini-key-input"),
-    btnSaveKey: document.getElementById("btn-save-key"),
-    aiFileInput: document.getElementById("ai-file-input"),
-    aiPreview: document.getElementById("ai-preview"),
-    aiPreviewImg: document.getElementById("ai-preview-img"),
-    btnAnalyzeAi: document.getElementById("btn-analyze-ai"),
-    aiStatus: document.getElementById("ai-status"),
-    aiResult: document.getElementById("ai-result")
   };
 
   function getReactions() {
@@ -71,27 +51,105 @@
   }
 
   function updateStats() {
-    if (dom.totalModelos) dom.totalModelos.textContent = state.cars.length;
-    if (dom.totalMarcas) {
+    const totalModelos = document.getElementById("total-modelos");
+    const totalMarcas = document.getElementById("total-marcas");
+    if (totalModelos) totalModelos.textContent = state.cars.length;
+    if (totalMarcas) {
       const marcas = new Set(
         state.cars
           .map((c) => c.marca)
           .filter((m) => m && !m.includes("Modelo a Identificar"))
       );
-      dom.totalMarcas.textContent = marcas.size;
+      totalMarcas.textContent = marcas.size;
     }
   }
 
+  function openModal(modal) {
+    if (!modal) return;
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeModal(modal) {
+    if (!modal) return;
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function showModal(car) {
+    const carModal = document.getElementById("car-modal");
+    const modalDetails = document.getElementById("modal-details");
+    if (!carModal || !modalDetails) return;
+
+    const hasDirectPhoto = Boolean(car.foto && car.foto.trim() !== "");
+    const fotoPath = hasDirectPhoto ? car.foto : `img/${car.id}.jpg`;
+
+    const modalVisual = `
+      <div class="modal-image-wrapper">
+        <img src="${encodeURI(fotoPath)}" 
+             alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+             class="modal-img" 
+             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+        <div class="modal-fallback" style="display:none;">
+          <img src="${LOGO_PADRAO}" alt="Garagem em Miniatura" class="logo-fallback-modal">
+        </div>
+      </div>`;
+
+    modalDetails.innerHTML = `
+      ${modalVisual}
+      <h2>${sanitize(car.marca)} ${sanitize(car.modelo)}</h2>
+      <div class="detail-row"><span>Número no Acervo:</span> <strong>#${car.id}</strong></div>
+      <div class="detail-row"><span>Ano de Fabricação:</span> <strong>${sanitize(car.ano)}</strong></div>
+      <div class="detail-row"><span>Categoria:</span> <strong>${sanitize(car.categoria)}</strong></div>
+      <div class="detail-row"><span>Fabricante da Miniatura:</span> <strong>${sanitize(car.fabricante)}</strong></div>
+    `;
+
+    openModal(carModal);
+  }
+
+  function handleVote(carId, type, comment = "") {
+    const reactions = getReactions();
+    if (!reactions[carId]) {
+      reactions[carId] = { likes: 0, dislikes: 0, userChoice: null, comment: "" };
+    }
+
+    const item = reactions[carId];
+
+    if (type === "like") {
+      if (item.userChoice === "like") {
+        item.likes = Math.max(0, item.likes - 1);
+        item.userChoice = null;
+      } else {
+        if (item.userChoice === "dislike") item.dislikes = Math.max(0, item.dislikes - 1);
+        item.likes += 1;
+        item.userChoice = "like";
+      }
+    } else if (type === "dislike") {
+      if (item.userChoice !== "dislike") {
+        if (item.userChoice === "like") item.likes = Math.max(0, item.likes - 1);
+        item.dislikes += 1;
+        item.userChoice = "dislike";
+      }
+      if (comment) item.comment = comment;
+    }
+
+    saveReactions(reactions);
+    applyFilters();
+  }
+
   function renderCars(carList) {
-    if (!dom.carsGrid) return;
-    dom.carsGrid.innerHTML = "";
+    const carsGrid = document.getElementById("cars-grid");
+    const noResults = document.getElementById("no-results");
+    if (!carsGrid) return;
+
+    carsGrid.innerHTML = "";
 
     if (!carList || carList.length === 0) {
-      if (dom.noResults) dom.noResults.classList.remove("hidden");
+      if (noResults) noResults.classList.remove("hidden");
       return;
     }
 
-    if (dom.noResults) dom.noResults.classList.add("hidden");
+    if (noResults) noResults.classList.add("hidden");
 
     const reactions = getReactions();
     const fragment = document.createDocumentFragment();
@@ -197,86 +255,15 @@
       fragment.appendChild(card);
     });
 
-    dom.carsGrid.appendChild(fragment);
-  }
-
-  function handleVote(carId, type, comment = "") {
-    const reactions = getReactions();
-    if (!reactions[carId]) {
-      reactions[carId] = { likes: 0, dislikes: 0, userChoice: null, comment: "" };
-    }
-
-    const item = reactions[carId];
-
-    if (type === "like") {
-      if (item.userChoice === "like") {
-        item.likes = Math.max(0, item.likes - 1);
-        item.userChoice = null;
-      } else {
-        if (item.userChoice === "dislike") item.dislikes = Math.max(0, item.dislikes - 1);
-        item.likes += 1;
-        item.userChoice = "like";
-      }
-    } else if (type === "dislike") {
-      if (item.userChoice !== "dislike") {
-        if (item.userChoice === "like") item.likes = Math.max(0, item.likes - 1);
-        item.dislikes += 1;
-        item.userChoice = "dislike";
-      }
-      if (comment) item.comment = comment;
-    }
-
-    saveReactions(reactions);
-    applyFilters();
-  }
-
-  function showModal(car) {
-    if (!dom.carModal || !dom.modalDetails) return;
-
-    const hasDirectPhoto = Boolean(car.foto && car.foto.trim() !== "");
-    const fotoPath = hasDirectPhoto ? car.foto : `img/${car.id}.jpg`;
-
-    const modalVisual = `
-      <div class="modal-image-wrapper">
-        <img src="${encodeURI(fotoPath)}" 
-             alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
-             class="modal-img" 
-             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-        <div class="modal-fallback" style="display:none;">
-          <img src="${LOGO_PADRAO}" alt="Garagem em Miniatura" class="logo-fallback-modal">
-        </div>
-      </div>`;
-
-    dom.modalDetails.innerHTML = `
-      ${modalVisual}
-      <h2>${sanitize(car.marca)} ${sanitize(car.modelo)}</h2>
-      <div class="detail-row"><span>Número no Acervo:</span> <strong>#${car.id}</strong></div>
-      <div class="detail-row"><span>Ano de Fabricação:</span> <strong>${sanitize(car.ano)}</strong></div>
-      <div class="detail-row"><span>Categoria:</span> <strong>${sanitize(car.categoria)}</strong></div>
-      <div class="detail-row"><span>Fabricante da Miniatura:</span> <strong>${sanitize(car.fabricante)}</strong></div>
-    `;
-
-    openModal(dom.carModal);
-  }
-
-  function closeModal(modal) {
-    if (!modal) return;
-    modal.classList.remove("active");
-    modal.setAttribute("aria-hidden", "true");
-  }
-
-  function openModal(modal) {
-    if (!modal) return;
-    modal.classList.add("active");
-    modal.setAttribute("aria-hidden", "false");
+    carsGrid.appendChild(fragment);
   }
 
   function applyFilters() {
     const q = state.searchQuery.toLowerCase().trim();
     const filtered = state.cars.filter((car) => {
       const matchText =
-        car.modelo.toLowerCase().includes(q) ||
-        car.marca.toLowerCase().includes(q) ||
+        (car.modelo && car.modelo.toLowerCase().includes(q)) ||
+        (car.marca && car.marca.toLowerCase().includes(q)) ||
         String(car.ano).includes(q);
       const matchCategory =
         state.categoryFilter === "todos" || car.categoria === state.categoryFilter;
@@ -286,20 +273,33 @@
   }
 
   function setupAiModule() {
-    const triggerAi = () => openModal(dom.aiModal);
-    dom.cardTriggerAi?.addEventListener("click", triggerAi);
-    dom.navBtnAi?.addEventListener("click", triggerAi);
+    const aiModal = document.getElementById("ai-modal");
+    const aiModalClose = document.getElementById("ai-modal-close");
+    const cardTriggerAi = document.getElementById("card-trigger-ai");
+    const navBtnAi = document.getElementById("nav-btn-ai");
+    const geminiKeyInput = document.getElementById("gemini-key-input");
+    const btnSaveKey = document.getElementById("btn-save-key");
+    const aiFileInput = document.getElementById("ai-file-input");
+    const aiPreview = document.getElementById("ai-preview");
+    const aiPreviewImg = document.getElementById("ai-preview-img");
+    const btnAnalyzeAi = document.getElementById("btn-analyze-ai");
+    const aiStatus = document.getElementById("ai-status");
+    const aiResult = document.getElementById("ai-result");
 
-    dom.aiModalClose?.addEventListener("click", () => closeModal(dom.aiModal));
-    dom.aiModal?.addEventListener("click", (e) => {
-      if (e.target === dom.aiModal) closeModal(dom.aiModal);
+    const triggerAi = () => openModal(aiModal);
+    cardTriggerAi?.addEventListener("click", triggerAi);
+    navBtnAi?.addEventListener("click", triggerAi);
+
+    aiModalClose?.addEventListener("click", () => closeModal(aiModal));
+    aiModal?.addEventListener("click", (e) => {
+      if (e.target === aiModal) closeModal(aiModal);
     });
 
     const savedKey = localStorage.getItem("gemini_api_key");
-    if (savedKey && dom.geminiKeyInput) dom.geminiKeyInput.value = savedKey;
+    if (savedKey && geminiKeyInput) geminiKeyInput.value = savedKey;
 
-    dom.btnSaveKey?.addEventListener("click", () => {
-      const key = dom.geminiKeyInput.value.trim();
+    btnSaveKey?.addEventListener("click", () => {
+      const key = geminiKeyInput.value.trim();
       if (!key) {
         localStorage.removeItem("gemini_api_key");
         alert("Chave removida!");
@@ -309,7 +309,7 @@
       alert("Chave salva com sucesso!");
     });
 
-    dom.aiFileInput?.addEventListener("change", (e) => {
+    aiFileInput?.addEventListener("change", (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -319,16 +319,16 @@
       reader.onload = (event) => {
         const fullBase64 = event.target.result;
         state.selectedImageBase64 = fullBase64.split(",")[1];
-        dom.aiPreviewImg.src = fullBase64;
-        dom.aiPreview.classList.remove("hidden");
-        dom.aiResult.classList.add("hidden");
-        dom.aiStatus.classList.add("hidden");
+        if (aiPreviewImg) aiPreviewImg.src = fullBase64;
+        aiPreview?.classList.remove("hidden");
+        aiResult?.classList.add("hidden");
+        aiStatus?.classList.add("hidden");
       };
       reader.readAsDataURL(file);
     });
 
-    dom.btnAnalyzeAi?.addEventListener("click", async () => {
-      const rawKey = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value || "";
+    btnAnalyzeAi?.addEventListener("click", async () => {
+      const rawKey = localStorage.getItem("gemini_api_key") || geminiKeyInput?.value || "";
       const key = rawKey.trim();
 
       if (!key) {
@@ -340,11 +340,13 @@
         return;
       }
 
-      dom.aiStatus.classList.remove("hidden");
-      dom.aiStatus.style.backgroundColor = "#1e293b";
-      dom.aiStatus.style.color = "#f59e0b";
-      dom.aiStatus.textContent = "⏳ Analisando com gemini-1.5-flash...";
-      dom.aiResult.classList.add("hidden");
+      if (aiStatus) {
+        aiStatus.classList.remove("hidden");
+        aiStatus.style.backgroundColor = "#1e293b";
+        aiStatus.style.color = "#f59e0b";
+        aiStatus.textContent = "⏳ Analisando com gemini-1.5-flash...";
+      }
+      aiResult?.classList.add("hidden");
 
       const prompt = `Você é um curador especialista em réplicas de automóveis e miniaturas.
 Analise detalhadamente a foto desta miniatura e compare com a lista dos 105 veículos deste acervo:
@@ -389,54 +391,61 @@ Responda em português de forma clara e estruturada:
         }
 
         const textoResposta = candidate.content?.parts?.[0]?.text;
-        dom.aiStatus.classList.add("hidden");
+        aiStatus?.classList.add("hidden");
 
-        if (textoResposta) {
-          dom.aiResult.classList.remove("hidden");
-          dom.aiResult.textContent = textoResposta;
-        } else {
-          throw new Error("Nenhum texto retornado pelo modelo.");
+        if (textoResposta && aiResult) {
+          aiResult.classList.remove("hidden");
+          aiResult.textContent = textoResposta;
         }
       } catch (err) {
-        dom.aiStatus.classList.remove("hidden");
-        dom.aiStatus.style.backgroundColor = "#450a0a";
-        dom.aiStatus.style.color = "#fca5a5";
-        dom.aiStatus.innerHTML = `<strong>❌ Erro no Scanner:</strong><br>${err.message}`;
+        if (aiStatus) {
+          aiStatus.classList.remove("hidden");
+          aiStatus.style.backgroundColor = "#450a0a";
+          aiStatus.style.color = "#fca5a5";
+          aiStatus.innerHTML = `<strong>❌ Erro no Scanner:</strong><br>${err.message}`;
+        }
       }
     });
   }
 
   function setupEventListeners() {
-    dom.searchInput?.addEventListener("input", (e) => {
+    const searchInput = document.getElementById("search-input");
+    searchInput?.addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
       applyFilters();
     });
 
-    dom.categoryFilters?.addEventListener("click", (e) => {
+    const categoryFilters = document.getElementById("category-filters");
+    categoryFilters?.addEventListener("click", (e) => {
       const btn = e.target.closest(".pill");
       if (!btn) return;
-      dom.categoryFilters.querySelectorAll(".pill").forEach((b) => b.classList.remove("active"));
+      categoryFilters.querySelectorAll(".pill").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       state.categoryFilter = btn.getAttribute("data-filter") || "todos";
       applyFilters();
     });
 
-    dom.modalClose?.addEventListener("click", () => closeModal(dom.carModal));
-    dom.carModal?.addEventListener("click", (e) => {
-      if (e.target === dom.carModal) closeModal(dom.carModal);
+    const carModal = document.getElementById("car-modal");
+    const modalClose = document.getElementById("modal-close");
+    modalClose?.addEventListener("click", () => closeModal(carModal));
+    carModal?.addEventListener("click", (e) => {
+      if (e.target === carModal) closeModal(carModal);
     });
 
-    dom.navBtnAbout?.addEventListener("click", () => openModal(dom.aboutModal));
-    dom.aboutModalClose?.addEventListener("click", () => closeModal(dom.aboutModal));
-    dom.aboutModal?.addEventListener("click", (e) => {
-      if (e.target === dom.aboutModal) closeModal(dom.aboutModal);
+    const aboutModal = document.getElementById("about-modal");
+    const aboutModalClose = document.getElementById("about-modal-close");
+    const navBtnAbout = document.getElementById("nav-btn-about");
+    navBtnAbout?.addEventListener("click", () => openModal(aboutModal));
+    aboutModalClose?.addEventListener("click", () => closeModal(aboutModal));
+    aboutModal?.addEventListener("click", (e) => {
+      if (e.target === aboutModal) closeModal(aboutModal);
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        closeModal(dom.carModal);
-        closeModal(dom.aiModal);
-        closeModal(dom.aboutModal);
+        closeModal(carModal);
+        closeModal(document.getElementById("ai-modal"));
+        closeModal(aboutModal);
       }
     });
 
@@ -453,9 +462,7 @@ Responda em português de forma clara e estruturada:
   }
 
   function init() {
-    if (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) {
-      state.cars = CARS_DATA;
-    }
+    state.cars = getCarrosDisponiveis();
     updateStats();
     renderCars(state.cars);
     setupEventListeners();
