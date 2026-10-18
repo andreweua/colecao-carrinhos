@@ -2,23 +2,20 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 3.2.0
+ * Versão: 4.0.0
  */
 
 (() => {
   "use strict";
 
-  // WhatsApp para envio de feedbacks
   const WHATSAPP_NUMERO = "5535992344229";
 
-  // Estado da aplicação
   const state = {
     cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
     categoryFilter: "todos",
     searchQuery: ""
   };
 
-  // Elementos do DOM
   const dom = {
     carsGrid: document.getElementById("cars-grid"),
     searchInput: document.getElementById("search-input"),
@@ -86,7 +83,6 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Foto limpa
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -96,11 +92,11 @@
         : `<span>${car.icon || "🚗"}</span>`;
 
       card.innerHTML = `
-        <div class="card-image" tabindex="0" role="button" aria-label="Ver detalhes de ${car.modelo}">
+        <div class="card-image" role="button" aria-label="Ver detalhes de ${car.modelo}">
           ${visualNode}
         </div>
         <div class="card-content">
-          <div class="card-clickable" tabindex="0" role="button" aria-label="Ver detalhes de ${car.modelo}">
+          <div class="card-clickable" role="button" aria-label="Ver detalhes de ${car.modelo}">
             <div class="card-brand">${sanitize(car.marca)}</div>
             <h2 class="card-title">${sanitize(car.modelo)}</h2>
           </div>
@@ -113,7 +109,7 @@
             <span class="card-id">#${car.id}</span>
           </div>
 
-          <!-- REAÇÕES -->
+          <!-- BOTÕES DE REAÇÃO -->
           <div class="card-actions">
             <div class="feedback-btns">
               <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
@@ -137,17 +133,9 @@
         </div>
       `;
 
-      // Zoom temporário antes de abrir o modal
-      const handleCardOpen = () => {
-        card.classList.add("card-pulse");
-        setTimeout(() => {
-          card.classList.remove("card-pulse");
-          showModal(car);
-        }, 300);
-      };
-
-      card.querySelector(".card-image").addEventListener("click", handleCardOpen);
-      card.querySelector(".card-clickable").addEventListener("click", handleCardOpen);
+      const openDetails = () => showModal(car);
+      card.querySelector(".card-image").addEventListener("click", openDetails);
+      card.querySelector(".card-clickable").addEventListener("click", openDetails);
 
       // Evento de Like
       card.querySelector(".btn-like").addEventListener("click", (e) => {
@@ -162,7 +150,7 @@
         box.classList.toggle("hidden");
       });
 
-      // Enviar opinião para o WhatsApp com link do acervo
+      // Enviar opinião para WhatsApp com link do acervo
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
@@ -299,7 +287,7 @@
       }
     });
 
-    // Controle do menu sanduíche mobile
+    // Menu sanduíche em cascata
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
 
