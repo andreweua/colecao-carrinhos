@@ -2,7 +2,7 @@
  * Garagem em Miniatura - Controlador da Aplicacao
  * PereiraLabs (divisao da Louzada & Pereira - Solucoes Digitais)
  * URL de Producao: https://andreweua.github.io/colecao-carrinhos/
- * Versao: 6.3.0
+ * Versao: 7.0.0
  */
 
 (function () {
@@ -12,7 +12,7 @@
   const LOGO_PADRAO = "img/logo-garagem.png";
 
   const state = {
-    cars: [],
+    cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
     categoryFilter: "todos",
     searchQuery: "",
     selectedImageBase64: null,
@@ -422,4 +422,48 @@ Responda em português de forma clara e estruturada:
     });
 
     dom.modalClose?.addEventListener("click", () => closeModal(dom.carModal));
-    dom.carModal?.addEventListener("
+    dom.carModal?.addEventListener("click", (e) => {
+      if (e.target === dom.carModal) closeModal(dom.carModal);
+    });
+
+    dom.navBtnAbout?.addEventListener("click", () => openModal(dom.aboutModal));
+    dom.aboutModalClose?.addEventListener("click", () => closeModal(dom.aboutModal));
+    dom.aboutModal?.addEventListener("click", (e) => {
+      if (e.target === dom.aboutModal) closeModal(dom.aboutModal);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModal(dom.carModal);
+        closeModal(dom.aiModal);
+        closeModal(dom.aboutModal);
+      }
+    });
+
+    const menuToggle = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("nav-menu");
+    if (menuToggle && navMenu) {
+      menuToggle.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        menuToggle.classList.toggle("active");
+      });
+    }
+
+    setupAiModule();
+  }
+
+  function init() {
+    if (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) {
+      state.cars = CARS_DATA;
+    }
+    updateStats();
+    renderCars(state.cars);
+    setupEventListeners();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
