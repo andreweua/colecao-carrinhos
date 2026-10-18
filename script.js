@@ -106,16 +106,35 @@
       card.setAttribute("data-id", car.id);
 
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
-      // NOVO: Exibe o ícone oficial da Garagem em Miniatura quando não houver foto
-const visualNode = hasPhoto
-  ? `<img src="${encodeURI(car.foto)}" 
-          alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
-          loading="lazy" 
-          onerror="this.onerror=null; this.src='img/icon-192.png';">`
-  : `<img src="img/icon-192.png" 
-          alt="Sem foto disponível" 
-          class="placeholder-icon" />`;
+      // Identifica se tem foto válida cadastrada
+      const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
+      
+      // Ícone padrão por categoria caso não tenha foto
+      const getCategoryEmoji = (cat) => {
+        switch(cat) {
+          case "Esportivo":
+          case "Muscle Car": return "🏎️";
+          case "Utilitário": return "🛻";
+          case "Viatura / Serviço": return "🚓";
+          default: return "🚗";
+        }
+      };
 
+      const fallbackEmoji = car.icon || getCategoryEmoji(car.categoria);
+
+      const visualNode = hasPhoto
+        ? `<img src="${encodeURI(car.foto)}" 
+                alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+                loading="lazy" 
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+           <div class="placeholder-fallback" style="display:none;">
+             <span class="fallback-icon">${fallbackEmoji}</span>
+             <span class="fallback-text">GaragemMini</span>
+           </div>`
+        : `<div class="placeholder-fallback">
+             <span class="fallback-icon">${fallbackEmoji}</span>
+             <span class="fallback-text">GaragemMini</span>
+           </div>`;
       card.innerHTML = `
         <div class="card-image" role="button" aria-label="Ver detalhes de ${car.modelo}">
           ${visualNode}
