@@ -7,6 +7,8 @@
   --text-muted: #94a3b8;
   --border-color: #262e3d;
   --tag-bg: #222938;
+  --like-color: #10b981;
+  --dislike-color: #ef4444;
 }
 
 * {
@@ -193,7 +195,7 @@ body {
   border-color: var(--primary);
 }
 
-/* GRID E CARDS (TRAVA DE TAMANHO DA IMAGEM) */
+/* GRID E CARDS */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -205,19 +207,18 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 14px;
   overflow: hidden;
-  cursor: pointer;
   display: flex;
   flex-direction: column;
   transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
 }
 
-.car-card:hover, .car-card:focus-visible {
+.car-card:hover {
   transform: translateY(-4px);
   border-color: #3b455b;
   background-color: var(--bg-card-hover);
 }
 
-/* Área da foto no card travada em 180px */
+/* ÁREA DA IMAGEM TOTALMENTE LIMPA */
 .card-image {
   width: 100%;
   height: 180px;
@@ -228,9 +229,9 @@ body {
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
 }
 
-/* Força a imagem a preencher sem distorcer e sem vazar */
 .card-image img {
   width: 100% !important;
   height: 100% !important;
@@ -241,25 +242,16 @@ body {
 .card-image span {
   font-size: 3rem;
 }
-//
-.card-tag-year {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(12, 14, 18, 0.85);
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border: 1px solid var(--border-color);
-  z-index: 2;
-}
 
 .card-content {
   padding: 16px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+.card-clickable {
+  cursor: pointer;
 }
 
 .card-brand {
@@ -273,10 +265,11 @@ body {
 .card-title {
   font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   line-height: 1.3;
 }
 
+/* BASE COM TAGS, ANO DISCRETO E ID */
 .card-footer {
   margin-top: auto;
   display: flex;
@@ -284,12 +277,131 @@ body {
   align-items: center;
   font-size: 0.75rem;
   color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.card-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .card-badge {
   background-color: var(--tag-bg);
   padding: 3px 8px;
   border-radius: 5px;
+}
+
+.card-year {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1.2;
+}
+
+.card-id {
+  font-weight: 700;
+}
+
+/* SEÇÃO DE LIKE / DISLIKE */
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+}
+
+.feedback-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-feedback {
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-feedback:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+}
+
+.btn-feedback.liked {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--like-color);
+  border-color: var(--like-color);
+}
+
+.btn-feedback.disliked {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--dislike-color);
+  border-color: var(--dislike-color);
+}
+
+/* CAIXA DE TEXTO DO DISLIKE */
+.dislike-box {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dislike-box textarea {
+  width: 100%;
+  height: 54px;
+  background-color: #0b0d13;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.78rem;
+  color: var(--text-main);
+  resize: none;
+  outline: none;
+}
+
+.dislike-box textarea:focus {
+  border-color: var(--dislike-color);
+}
+
+.dislike-box-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.btn-mini {
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-mini-send {
+  background-color: var(--dislike-color);
+  color: #fff;
+}
+
+.btn-mini-cancel {
+  background-color: transparent;
+  color: var(--text-muted);
 }
 
 .no-results {
@@ -302,7 +414,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;

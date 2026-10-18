@@ -26,6 +26,19 @@
     modalClose: document.getElementById("modal-close")
   };
 
+  // Gerenciamento de Reações (Like/Dislike e Comentários) no localStorage
+  const getReactions = () => {
+    try {
+      return JSON.parse(localStorage.getItem("garagem_reactions")) || {};
+    } catch {
+      return {};
+    }
+  };
+
+  const saveReactions = (data) => {
+    localStorage.setItem("garagem_reactions", JSON.stringify(data));
+  };
+
   const sanitize = (str) => {
     if (!str) return "";
     return String(str)
@@ -59,16 +72,17 @@
 
     if (dom.noResults) dom.noResults.classList.add("hidden");
 
+    const reactions = getReactions();
     const fragment = document.createDocumentFragment();
 
     carList.forEach((car) => {
+      const carReactions = reactions[car.id] || { likes: 0, dislikes: 0, userChoice: null, comment: "" };
+
       const card = document.createElement("article");
       card.className = "car-card";
-      card.setAttribute("tabindex", "0");
-      card.setAttribute("role", "button");
-      card.setAttribute("aria-label", `${car.marca} ${car.modelo}`);
+      card.setAttribute("data-id", car.id);
 
-      // Verifica estritamente o campo 'foto' e aplica fallback caso o arquivo falhe
+      // Foto limpa
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -78,33 +92,113 @@
         : `<span>${car.icon || "🚗"}</span>`;
 
       card.innerHTML = `
-        <div class="card-image">
+        <div class="card-image" tabindex="0" role="button" aria-label="Ver detalhes de ${car.modelo}">
           ${visualNode}
-          ${car.ano !== "—" ? `<span class="card-tag-year">${sanitize(car.ano)}</span>` : ""}
         </div>
         <div class="card-content">
-          <div class="card-brand">${sanitize(car.marca)}</div>
-          <h2 class="card-title">${sanitize(car.modelo)}</h2>
-          <div class="card-footer">
-            <span class="card-badge">${sanitize(car.categoria)}</span>
-            <span>#${car.id}</span>
+          <div class="card-clickable" tabindex="0" role="button" aria-label="Ver detalhes de ${car.modelo}">
+            <div class="card-brand">${sanitize(car.marca)}</div>
+            <h2 class="card-title">${sanitize(car.modelo)}</h2>
           </div>
+          
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-badge">${sanitize(car.categoria)}</span>
+              ${car.ano !== "—" ? `<span class="card-year">${sanitize(car.ano)}</span>` : ""}
+            </div>
+            <span class="card-id">#${car.id}</span>
+          </div>
+
+          <!-- BOTÕES DE REAÇÃO -->
+          <div class="card-actions">
+            <div class="feedback-btns">
+              <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
+                👍 <span>${carReactions.likes}</span>
+              </button>
+              <button class="btn-feedback btn-dislike ${carReactions.userChoice === "dislike" ? "disliked" : ""}" data-id="${car.id}">
+                👎 <span>${carReactions.dislikes}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CAIXA DE TEXTO DO DISLIKE (INICIALMENTE OCULTA) -->
+          <div class="dislike-box hidden" id="dislike-box-${car.id}">
+            <textarea placeholder="Por que não curtiu? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
+            <div class="dislike-box-actions">
+              <button class="btn-mini btn-mini-cancel" data-id="${car.id}">Cancelar</button>
+              <button class="btn-mini btn-mini-send" data-id="${car.id}">Enviar</button>
+            </div>
+          </div>
+
         </div>
       `;
 
-      const openHandler = () => showModal(car);
-      card.addEventListener("click", openHandler);
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          openHandler();
-        }
+      // Eventos para abrir o modal de detalhes
+      const openModal = () => showModal(car);
+      card.querySelector(".card-image").addEventListener("click", openModal);
+      card.querySelector(".card-clickable").addEventListener("click", openModal);
+
+      // Evento de Like
+      card.querySelector(".btn-like").addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleVote(car.id, "like");
+      });
+
+      // Evento de Dislike
+      card.querySelector(".btn-dislike").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const box = card.querySelector(`#dislike-box-${car.id}`);
+        box.classList.toggle("hidden");
+      });
+
+      // Salvar comentário de Dislike
+      card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
+        e.stopPropagation();
+        const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
+        handleVote(car.id, "dislike", textarea.value.trim());
+        card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
+      });
+
+      // Cancelar comentário
+      card.querySelector(".btn-mini-cancel").addEventListener("click", (e) => {
+        e.stopPropagation();
+        card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
       });
 
       fragment.appendChild(card);
     });
 
     dom.carsGrid.appendChild(fragment);
+  };
+
+  const handleVote = (carId, type, comment = "") => {
+    const reactions = getReactions();
+    if (!reactions[carId]) {
+      reactions[carId] = { likes: 0, dislikes: 0, userChoice: null, comment: "" };
+    }
+
+    const item = reactions[carId];
+
+    if (type === "like") {
+      if (item.userChoice === "like") {
+        item.likes = Math.max(0, item.likes - 1);
+        item.userChoice = null;
+      } else {
+        if (item.userChoice === "dislike") item.dislikes = Math.max(0, item.dislikes - 1);
+        item.likes += 1;
+        item.userChoice = "like";
+      }
+    } else if (type === "dislike") {
+      if (item.userChoice !== "dislike") {
+        if (item.userChoice === "like") item.likes = Math.max(0, item.likes - 1);
+        item.dislikes += 1;
+        item.userChoice = "dislike";
+      }
+      if (comment) item.comment = comment;
+    }
+
+    saveReactions(reactions);
+    applyFilters();
   };
 
   const showModal = (car) => {
