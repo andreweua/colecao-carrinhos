@@ -2,13 +2,13 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL de Produção: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 6.2.0
+ * Versão: 6.2.1
  */
 
 function iniciarAplicacao() {
   const WHATSAPP_NUMERO = "5535992344229";
 
-  // Lê a lista de carros diretamente do data.js
+  // Garante os dados vindos de CARS_DATA (data.js)
   const state = {
     cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
     categoryFilter: "todos",
@@ -77,6 +77,24 @@ function iniciarAplicacao() {
     }
   };
 
+  // Trata erro de carregamento tentando extensões comuns (.jpg, .JPG, .jpeg, .png)
+  window.tratarErroImagem = function(img, carId) {
+    const srcAtual = img.getAttribute("src") || "";
+    if (srcAtual.endsWith(".jpg")) {
+      img.src = `img/${carId}.JPG`;
+    } else if (srcAtual.endsWith(".JPG")) {
+      img.src = `img/${carId}.jpeg`;
+    } else if (srcAtual.endsWith(".jpeg")) {
+      img.src = `img/${carId}.png`;
+    } else {
+      // Se não achar em nenhum formato, esconde a imagem e mostra a logo oficial
+      img.style.display = "none";
+      if (img.nextElementSibling) {
+        img.nextElementSibling.style.display = "flex";
+      }
+    }
+  };
+
   const renderCars = (carList) => {
     if (!dom.carsGrid) return;
     dom.carsGrid.innerHTML = "";
@@ -98,13 +116,14 @@ function iniciarAplicacao() {
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
+      // Busca a foto informada no data.js ou tenta carregar pelo ID: img/[id].jpg
       const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
 
       const visualNode = `
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              loading="lazy" 
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             onerror="window.tratarErroImagem(this, ${car.id});">
         <div class="placeholder-fallback" style="display:none;">
           <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-img">
         </div>`;
@@ -234,7 +253,7 @@ function iniciarAplicacao() {
         <img src="${encodeURI(fotoPath)}" 
              alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
              class="modal-img" 
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             onerror="window.tratarErroImagem(this, ${car.id});">
         <div class="modal-fallback" style="display:none;">
           <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-modal">
         </div>
