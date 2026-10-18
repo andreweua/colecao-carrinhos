@@ -340,35 +340,35 @@
     });
 
     dom.btnAnalyzeAi?.addEventListener("click", async () => {
-      const key = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value.trim();
+      // 1. Limpa espaços extras acidentais na chave da API
+      const rawKey = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value || "";
+      const key = rawKey.trim();
+
       if (!key) {
-        alert("Por favor, insira a chave da Google AI Studio.");
+        alert("Por favor, insira a chave da Google AI Studio no campo acima e clique em 'Salvar Chave'.");
         return;
       }
       if (!state.selectedImageBase64) {
-        alert("Por favor, selecione uma imagem.");
+        alert("Por favor, selecione ou tire a foto da miniatura antes de analisar.");
         return;
       }
 
       dom.aiStatus.classList.remove("hidden");
-      dom.aiStatus.textContent = "⏳ Analisando miniatura com IA...";
+      dom.aiStatus.textContent = "⏳ Conectando à IA e comparando com o acervo...";
       dom.aiResult.classList.add("hidden");
 
-      // Monta a lista do acervo para o prompt de conferência
-      const prompt = `Você é um especialista em carrinhos em miniatura e curador de acervos. 
-Analise a imagem desta miniatura e compare com a lista dos 105 veículos deste acervo:
+      const prompt = `Você é um curador especialista em réplicas de automóveis e miniaturas.
+Analise detalhadamente a foto desta miniatura e compare com a lista dos 105 veículos deste acervo:
 ${state.cars.map((c) => `#${c.id}${c.marca} ${c.modelo} (${c.ano})`).join("; ")}
 
-Responda de forma direta e objetiva:
-1. Qual é a marca, modelo e categoria mais provável desta miniatura?
-2. Este carrinho já consta na coleção acima? Se sim, qual é o número (#ID) dele? Se não, avise que se trata de uma nova aquisição em potencial.`;
+Responda em português de forma clara e estruturada:
+1. Marca, Modelo e Categoria mais prováveis do veículo na foto.
+2. Este modelo já existe na lista acima? Se sim, cite o número (#ID) correspondente. Se não existir, declare como 'Possível Nova Aquisição'.`;
 
-      // Detecta dinamicamente se a imagem é png ou jpeg
       const mimeType = state.selectedImageMime || "image/jpeg";
 
       try {
-        // Usa o modelo estável oficial gemini-1.5-flash ou gemini-2.0-flash
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`;
 
         const res = await fetch(url, {
           method: "POST",
@@ -392,27 +392,43 @@ Responda de forma direta e objetiva:
 
         const data = await res.json();
 
-        // Se a API do Google retornar erro (ex: chave inválida, cota esgotada)
-        if (data.error) {
-          throw new Error(data.error.message || "Erro retornado pela Google AI");
+        // Se o Google recusar a requisição (erro HTTP ou chave errada)
+        if (!res.ok || data.error) {
+          const msgErro = data.error?.message || `Erro HTTP ${res.status}: ${res.statusText}`;
+          throw new Error(msgErro);
         }
 
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        // Verifica se houve bloqueio de segurança ou resposta vazia
+        const candidate = data.candidates?.[0];
+        if (!candidate) {
+          throw new Error("A IA não gerou candidatos de resposta. Tente reenviar a foto.");
+        }
+
+        if (candidate.finishReason && candidate.finishReason !== "STOP") {
+          if (candidate.finishReason === "SAFETY") {
+            throw new Error("A imagem foi bloqueada pelos filtros automáticos de segurança do Google.");
+          }
+        }
+
+        const textoResposta = candidate.content?.parts?.[0]?.text;
+
         dom.aiStatus.classList.add("hidden");
 
-        if (text) {
+        if (textoResposta) {
           dom.aiResult.classList.remove("hidden");
-          dom.aiResult.textContent = text;
+          dom.aiResult.textContent = textoResposta;
         } else {
-          dom.aiResult.classList.remove("hidden");
-          dom.aiResult.textContent = "A IA analisou a foto, mas não gerou descrição conclusiva. Tente uma foto com iluminação melhor.";
+          throw new Error("A IA processou a imagem, mas nenhum texto foi gerado.");
         }
+
       } catch (err) {
         dom.aiStatus.classList.remove("hidden");
-        dom.aiStatus.textContent = `❌ Erro no Scanner: ${err.message}`;
+        dom.aiStatus.style.backgroundColor = "#450a0a";
+        dom.aiStatus.style.color = "#fca5a5";
+        dom.aiStatus.innerHTML = `<strong>❌ Falha no Scanner:</strong><br>${err.message}`;
+        console.error("Erro detalhado do Gemini:", err);
       }
-    });
-  function setupEventListeners() {
+    });  function setupEventListeners() {
     dom.searchInput?.addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
       applyFilters();
