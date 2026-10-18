@@ -2,10 +2,11 @@
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
  * URL de Produção: https://andreweua.github.io/colecao-carrinhos/
+ * Base de Dados do Catálogo - v6.2.0
  */
 
 const CARS_DATA = [
-  { "id": 1, "marca": "Ferrari", "modelo": "Sunnyside", "ano": "—", "fabricante": "Sunnyside", "categoria": "Esportivo", "icon": "🏎️", "foto": "" },
+  { "id": 1, "marca": "Mercedes-Benz", "modelo": "500 SL", "ano": "—", "fabricante": "—", "categoria": "Esportivo", "icon": "🏎️", "foto": "img/1.jpg" },
   { "id": 2, "marca": "Larven", "modelo": "Modellauto Katalog", "ano": "—", "fabricante": "Larven", "categoria": "Clássico", "icon": "🚗", "foto": "" },
   { "id": 3, "marca": "Gurgel", "modelo": "Itaipu E-400 Telerj Rio de Janeiro Cpt", "ano": "1976", "fabricante": "Welly", "categoria": "Nacional", "icon": "🚗", "foto": "" },
   { "id": 4, "marca": "Ford", "modelo": "Vicky", "ano": "1932", "fabricante": "—", "categoria": "Clássico", "icon": "🚗", "foto": "" },

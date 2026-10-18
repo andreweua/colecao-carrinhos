@@ -1,15 +1,14 @@
 /**
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada & Pereira - Soluções Digitais)
- * URL: https://andreweua.github.io/colecao-carrinhos/
- * Versão: 5.3.0
+ * URL de Produção: https://andreweua.github.io/colecao-carrinhos/
+ * Versão: 6.2.0
  */
 
-(() => {
-  "use strict";
-
+function iniciarAplicacao() {
   const WHATSAPP_NUMERO = "5535992344229";
 
+  // Lê a lista de carros diretamente do data.js
   const state = {
     cars: (typeof CARS_DATA !== "undefined" && Array.isArray(CARS_DATA)) ? CARS_DATA : [],
     categoryFilter: "todos",
@@ -24,18 +23,12 @@
     noResults: document.getElementById("no-results"),
     totalModelos: document.getElementById("total-modelos"),
     totalMarcas: document.getElementById("total-marcas"),
-    
-    // Modal Carro
     carModal: document.getElementById("car-modal"),
     modalDetails: document.getElementById("modal-details"),
     modalClose: document.getElementById("modal-close"),
-
-    // Modal Sobre
     aboutModal: document.getElementById("about-modal"),
     aboutModalClose: document.getElementById("about-modal-close"),
     navBtnAbout: document.getElementById("nav-btn-about"),
-
-    // Modal e Controles de IA
     aiModal: document.getElementById("ai-modal"),
     aiModalClose: document.getElementById("ai-modal-close"),
     cardTriggerAi: document.getElementById("card-trigger-ai"),
@@ -53,7 +46,7 @@
   const getReactions = () => {
     try {
       return JSON.parse(localStorage.getItem("garagem_reactions")) || {};
-    } catch {
+    } catch (e) {
       return {};
     }
   };
@@ -88,7 +81,7 @@
     if (!dom.carsGrid) return;
     dom.carsGrid.innerHTML = "";
 
-    if (carList.length === 0) {
+    if (!carList || carList.length === 0) {
       if (dom.noResults) dom.noResults.classList.remove("hidden");
       return;
     }
@@ -105,11 +98,7 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Define o caminho da foto: se car.foto estiver preenchido usa ele, 
-      // senão tenta buscar automaticamente pelo ID na pasta img/ (ex: img/1.jpg)
-      const fotoPath = (car.foto && car.foto.trim() !== "") 
-        ? car.foto 
-        : `img/${car.id}.jpg`;
+      const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
 
       const visualNode = `
         <img src="${encodeURI(fotoPath)}" 
@@ -117,8 +106,7 @@
              loading="lazy" 
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         <div class="placeholder-fallback" style="display:none;">
-          <span class="fallback-icon">${car.icon || "🏎️"}</span>
-          <span class="fallback-text">GaragemMini</span>
+          <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-img">
         </div>`;
 
       card.innerHTML = `
@@ -157,7 +145,6 @@
               <button class="btn-mini btn-mini-send" data-id="${car.id}">Enviar no WhatsApp</button>
             </div>
           </div>
-
         </div>
       `;
 
@@ -172,8 +159,7 @@
 
       card.querySelector(".btn-dislike").addEventListener("click", (e) => {
         e.stopPropagation();
-        const box = card.querySelector(`#dislike-box-${car.id}`);
-        box.classList.toggle("hidden");
+        card.querySelector(`#dislike-box-${car.id}`).classList.toggle("hidden");
       });
 
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
@@ -194,8 +180,7 @@
                     `💬 *Opinião:* "${comentario}"\n\n` +
                     `🔗 *Acesse o catálogo:* https://andreweua.github.io/colecao-carrinhos/`;
 
-        const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
-        window.open(url, "_blank");
+        window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`, "_blank");
       });
 
       card.querySelector(".btn-mini-cancel").addEventListener("click", (e) => {
@@ -242,15 +227,18 @@
   const showModal = (car) => {
     if (!dom.carModal || !dom.modalDetails) return;
 
-    const fotoPath = (car.foto && car.foto.trim() !== "") 
-      ? car.foto 
-      : `img/${car.id}.jpg`;
+    const fotoPath = (car.foto && car.foto.trim() !== "") ? car.foto : `img/${car.id}.jpg`;
 
     const modalVisual = `
-      <img src="${encodeURI(fotoPath)}" 
-           alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
-           class="modal-img" 
-           onerror="this.style.display='none';">`;
+      <div class="modal-image-wrapper">
+        <img src="${encodeURI(fotoPath)}" 
+             alt="${sanitize(car.marca)} ${sanitize(car.modelo)}" 
+             class="modal-img" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="modal-fallback" style="display:none;">
+          <img src="img/icon-192.png" alt="Garagem em Miniatura" class="logo-fallback-modal">
+        </div>
+      </div>`;
 
     dom.modalDetails.innerHTML = `
       ${modalVisual}
@@ -264,29 +252,16 @@
     openModal(dom.carModal);
   };
 
-    dom.modalDetails.innerHTML = `
-      ${modalVisual}
-      <h2>${sanitize(car.marca)} ${sanitize(car.modelo)}</h2>
-      <div class="detail-row"><span>Número no Acervo:</span> <strong>#${car.id}</strong></div>
-      <div class="detail-row"><span>Ano de Fabricação:</span> <strong>${sanitize(car.ano)}</strong></div>
-      <div class="detail-row"><span>Categoria:</span> <strong>${sanitize(car.categoria)}</strong></div>
-      <div class="detail-row"><span>Fabricante da Miniatura:</span> <strong>${sanitize(car.fabricante)}</strong></div>
-    `;
-
-    dom.carModal.classList.add("active");
-    dom.carModal.setAttribute("aria-hidden", "false");
+  const closeModal = (modal) => {
+    if (!modal) return;
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
   };
 
-  const closeModal = (modalElement) => {
-    if (!modalElement) return;
-    modalElement.classList.remove("active");
-    modalElement.setAttribute("aria-hidden", "true");
-  };
-
-  const openModal = (modalElement) => {
-    if (!modalElement) return;
-    modalElement.classList.add("active");
-    modalElement.setAttribute("aria-hidden", "false");
+  const openModal = (modal) => {
+    if (!modal) return;
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
   };
 
   const applyFilters = () => {
@@ -303,9 +278,7 @@
     renderCars(filtered);
   };
 
-  /* INTEGRAÇÃO COM GEMINI 3.8 FLASH NO MODAL */
   const setupAiModule = () => {
-    // Abrir Modal de IA
     const triggerAi = () => openModal(dom.aiModal);
     dom.cardTriggerAi?.addEventListener("click", triggerAi);
     dom.navBtnAi?.addEventListener("click", triggerAi);
@@ -316,15 +289,13 @@
     });
 
     const savedKey = localStorage.getItem("gemini_api_key");
-    if (savedKey && dom.geminiKeyInput) {
-      dom.geminiKeyInput.value = savedKey;
-    }
+    if (savedKey && dom.geminiKeyInput) dom.geminiKeyInput.value = savedKey;
 
     dom.btnSaveKey?.addEventListener("click", () => {
       const key = dom.geminiKeyInput.value.trim();
       if (!key) {
         localStorage.removeItem("gemini_api_key");
-        alert("Chave de API removida!");
+        alert("Chave removida!");
         return;
       }
       localStorage.setItem("gemini_api_key", key);
@@ -350,104 +321,60 @@
     dom.btnAnalyzeAi?.addEventListener("click", async () => {
       const key = localStorage.getItem("gemini_api_key") || dom.geminiKeyInput?.value.trim();
       if (!key) {
-        alert("Por favor, informe sua chave da Google AI Studio antes de analisar.");
+        alert("Por favor, insira a chave da Google AI Studio.");
         return;
       }
-
       if (!state.selectedImageBase64) {
-        alert("Por favor, tire uma foto ou selecione uma imagem.");
+        alert("Por favor, selecione uma imagem.");
         return;
       }
 
       dom.aiStatus.classList.remove("hidden");
-      dom.aiStatus.textContent = "⏳ Analisando miniatura com a IA do Google (gemini-3.8-flash)...";
+      dom.aiStatus.textContent = "⏳ Analisando com gemini-3.8-flash...";
       dom.aiResult.classList.add("hidden");
 
-      const acervoResumido = state.cars
-        .map((c) => `#${c.id} ${c.marca} ${c.modelo} (${c.ano})`)
-        .join("; ");
-
-      const prompt = `Você é um curador especialista em réplicas de carrinhos em miniatura do projeto Garagem em Miniatura.
-Analise a imagem enviada e determine qual veículo/modelo ela representa (marca, modelo provável, cor e estilo de carroceria).
-Em seguida, compare rigorosamente com o catálogo de 105 veículos que o colecionador já possui:
-[CATÁLOGO: ${acervoResumido}]
-
-Responda em português de forma clara no seguinte formato:
-1. Identificação da Foto: Modelo, marca e detalhes visíveis.
-2. Comparação de Acervo: O colecionador JÁ POSSUI este veículo (ou algum modelo muito próximo)? Se sim, cite o #ID e o nome do carro correspondente no acervo. Se não possuir, confirme que se trata de uma peça inédita.
-3. Veredito para compra: "Peça Inédita - Recomendada" ou "Atenção: Possível Duplicata".`;
+      const prompt = `Analise este carrinho e compare com os 105 veículos do acervo: ` +
+        state.cars.map((c) => `#${c.id} ${c.marca} ${c.modelo}`).join("; ");
 
       try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    { text: prompt },
-                    {
-                      inline_data: {
-                        mime_type: "image/jpeg",
-                        data: state.selectedImageBase64
-                      }
-                    }
-                  ]
-                }
-              ]
-            })
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.error) {
-          throw new Error(data.error.message || "Erro retornado pela API do Google.");
-        }
-
-        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!candidateText) {
-          throw new Error("Não foi possível gerar a análise da imagem.");
-        }
-
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: "image/jpeg", data: state.selectedImageBase64 } }] }]
+          })
+        });
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
         dom.aiStatus.classList.add("hidden");
         dom.aiResult.classList.remove("hidden");
-        dom.aiResult.textContent = candidateText;
+        dom.aiResult.textContent = text || "Não foi possível identificar.";
       } catch (err) {
-        dom.aiStatus.classList.remove("hidden");
-        dom.aiStatus.textContent = `❌ Erro na análise: ${err.message}`;
+        dom.aiStatus.textContent = `❌ Erro: ${err.message}`;
       }
     });
   };
 
   const setupEventListeners = () => {
-    if (dom.searchInput) {
-      dom.searchInput.addEventListener("input", (e) => {
-        state.searchQuery = e.target.value;
-        applyFilters();
-      });
-    }
+    dom.searchInput?.addEventListener("input", (e) => {
+      state.searchQuery = e.target.value;
+      applyFilters();
+    });
 
-    if (dom.categoryFilters) {
-      dom.categoryFilters.addEventListener("click", (e) => {
-        const btn = e.target.closest(".pill");
-        if (!btn) return;
-        dom.categoryFilters.querySelectorAll(".pill").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        state.categoryFilter = btn.getAttribute("data-filter") || "todos";
-        applyFilters();
-      });
-    }
+    dom.categoryFilters?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".pill");
+      if (!btn) return;
+      dom.categoryFilters.querySelectorAll(".pill").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.categoryFilter = btn.getAttribute("data-filter") || "todos";
+      applyFilters();
+    });
 
-    // Modal Carro
     dom.modalClose?.addEventListener("click", () => closeModal(dom.carModal));
     dom.carModal?.addEventListener("click", (e) => {
       if (e.target === dom.carModal) closeModal(dom.carModal);
     });
 
-    // Modal Sobre o Projeto (Opção 1)
     dom.navBtnAbout?.addEventListener("click", () => openModal(dom.aboutModal));
     dom.aboutModalClose?.addEventListener("click", () => closeModal(dom.aboutModal));
     dom.aboutModal?.addEventListener("click", (e) => {
@@ -464,31 +391,23 @@ Responda em português de forma clara no seguinte formato:
 
     const menuToggle = document.getElementById("menu-toggle");
     const navMenu = document.getElementById("nav-menu");
-
     if (menuToggle && navMenu) {
       menuToggle.addEventListener("click", () => {
-        const isOpen = navMenu.classList.toggle("active");
+        navMenu.classList.toggle("active");
         menuToggle.classList.toggle("active");
-        menuToggle.setAttribute("aria-expanded", String(isOpen));
-      });
-
-      navMenu.querySelectorAll(".nav-link, .nav-btn-link").forEach((link) => {
-        link.addEventListener("click", () => {
-          navMenu.classList.remove("active");
-          menuToggle.classList.remove("active");
-          menuToggle.setAttribute("aria-expanded", "false");
-        });
       });
     }
 
     setupAiModule();
   };
 
-  const init = () => {
-    updateStats();
-    renderCars(state.cars);
-    setupEventListeners();
-  };
+  updateStats();
+  renderCars(state.cars);
+  setupEventListeners();
+}
 
-  init();
-})();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciarAplicacao);
+} else {
+  iniciarAplicacao();
+}
