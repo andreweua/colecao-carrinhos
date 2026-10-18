@@ -1,10 +1,14 @@
 /**
  * Garagem em Miniatura - Controlador da Aplicação
  * PereiraLabs (divisão da Louzada&Pereira - Soluções Digitais)
+ * Versão: 2.1.0
  */
 
 (() => {
   "use strict";
+
+  // Número de WhatsApp para receber feedbacks de Dislike
+  const WHATSAPP_NUMERO = "5535992344229";
 
   // Estado da aplicação
   const state = {
@@ -26,7 +30,7 @@
     modalClose: document.getElementById("modal-close")
   };
 
-  // Gerenciamento de Reações (Like/Dislike e Comentários) no localStorage
+  // Gerenciamento de reações locais
   const getReactions = () => {
     try {
       return JSON.parse(localStorage.getItem("garagem_reactions")) || {};
@@ -82,7 +86,7 @@
       card.className = "car-card";
       card.setAttribute("data-id", car.id);
 
-      // Foto limpa
+      // Foto limpa (sem tags flutuantes por cima)
       const hasPhoto = Boolean(car.foto && car.foto.trim() !== "");
       const visualNode = hasPhoto
         ? `<img src="${encodeURI(car.foto)}" 
@@ -109,7 +113,7 @@
             <span class="card-id">#${car.id}</span>
           </div>
 
-          <!-- BOTÕES DE REAÇÃO -->
+          <!-- BOTÕES DE LIKE E DISLIKE -->
           <div class="card-actions">
             <div class="feedback-btns">
               <button class="btn-feedback btn-like ${carReactions.userChoice === "like" ? "liked" : ""}" data-id="${car.id}">
@@ -121,45 +125,59 @@
             </div>
           </div>
 
-          <!-- CAIXA DE TEXTO DO DISLIKE (INICIALMENTE OCULTA) -->
+          <!-- FORMULÁRIO DE FEEDBACK DO DISLIKE -->
           <div class="dislike-box hidden" id="dislike-box-${car.id}">
-            <textarea placeholder="Por que não curtiu? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
+            <textarea placeholder="O que achou deste modelo? (opinião curta)...">${sanitize(carReactions.comment || "")}</textarea>
             <div class="dislike-box-actions">
               <button class="btn-mini btn-mini-cancel" data-id="${car.id}">Cancelar</button>
-              <button class="btn-mini btn-mini-send" data-id="${car.id}">Enviar</button>
+              <button class="btn-mini btn-mini-send" data-id="${car.id}">Enviar no WhatsApp</button>
             </div>
           </div>
 
         </div>
       `;
 
-      // Eventos para abrir o modal de detalhes
+      // Modal de detalhes
       const openModal = () => showModal(car);
       card.querySelector(".card-image").addEventListener("click", openModal);
       card.querySelector(".card-clickable").addEventListener("click", openModal);
 
-      // Evento de Like
+      // Ação de Like
       card.querySelector(".btn-like").addEventListener("click", (e) => {
         e.stopPropagation();
         handleVote(car.id, "like");
       });
 
-      // Evento de Dislike
+      // Ação de Dislike (alterna exibição da caixa de texto)
       card.querySelector(".btn-dislike").addEventListener("click", (e) => {
         e.stopPropagation();
         const box = card.querySelector(`#dislike-box-${car.id}`);
         box.classList.toggle("hidden");
       });
 
-      // Salvar comentário de Dislike
+      // Enviar opinião para o WhatsApp
       card.querySelector(".btn-mini-send").addEventListener("click", (e) => {
         e.stopPropagation();
         const textarea = card.querySelector(`#dislike-box-${car.id} textarea`);
-        handleVote(car.id, "dislike", textarea.value.trim());
+        const comentario = textarea.value.trim();
+
+        if (!comentario) {
+          alert("Por favor, digite sua opinião antes de enviar!");
+          return;
+        }
+
+        handleVote(car.id, "dislike", comentario);
         card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
+
+        const msg = `*Feedback Coleção de Carrinhos*\n` +
+                    `🏎️ *Item:* #${car.id} - ${car.marca} ${car.modelo} (${car.ano})\n` +
+                    `💬 *Opinião:* "${comentario}"`;
+
+        const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`;
+        window.open(url, "_blank");
       });
 
-      // Cancelar comentário
+      // Cancelar envio de dislike
       card.querySelector(".btn-mini-cancel").addEventListener("click", (e) => {
         e.stopPropagation();
         card.querySelector(`#dislike-box-${car.id}`).classList.add("hidden");
