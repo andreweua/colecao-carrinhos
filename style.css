@@ -241,18 +241,23 @@ body {
 .card-image span {
   font-size: 3rem;
 }
-
+//
 .card-tag-year {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   background-color: rgba(12, 14, 18, 0.85);
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  backdrop-filter: blur(4px);
+  color: var(--text-main);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.72rem;      /* Reduz e padroniza o tamanho da fonte */
   font-weight: 700;
+  line-height: 1.2;        /* Impede que o texto estique a caixa */
+  letter-spacing: 0.5px;
   border: 1px solid var(--border-color);
   z-index: 2;
+  pointer-events: none;    /* Evita interferir no clique do card */
 }
 
 .card-content {
