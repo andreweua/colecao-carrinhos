@@ -325,6 +325,8 @@
       const file = e.target.files?.[0];
       if (!file) return;
 
+      state.selectedImageMime = file.type || "image/jpeg";
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const fullBase64 = event.target.result;
